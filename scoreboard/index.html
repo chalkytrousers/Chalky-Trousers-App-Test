@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <link rel="manifest" href="manifest.json?v=12">
+    <link rel="manifest" href="manifest.json?v=13">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -21,11 +21,13 @@
             --border-color: rgba(255, 255, 255, 0.1);
         }
 
+        /* Prevent all automatic browser behaviors */
         * {
             box-sizing: border-box;
-            user-select: none; /* Prevents text selection/search triggers */
-            -webkit-user-select: none;
+            user-select: none !important;
+            -webkit-user-select: none !important;
             -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
 
         body, html {
@@ -63,7 +65,6 @@
         }
 
         .logo-text { font-size: 1.2rem; font-weight: 700; letter-spacing: 2px; color: rgba(255,255,255,0.7); }
-        .nav-controls { display: flex; gap: 10px; }
 
         .nav-btn {
             background: #222; border: 1px solid #444; color: white;
@@ -77,40 +78,42 @@
             flex: 1; display: flex; flex-direction: column;
             justify-content: center; align-items: center;
             border-right: 1px solid var(--border-color);
+            position: relative;
         }
         .player-pane:last-child { border-right: none; }
 
-        /* NAME STYLING: Static by default to block search */
-        .player-name {
-            font-size: clamp(1rem, 3vw, 2.5rem);
-            text-transform: uppercase;
-            color: #777;
+        /* NAME AREA: Fixed island to prevent scoring bleed */
+        .name-box {
+            z-index: 100;
+            padding: 10px 30px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            border-radius: 8px;
+            transition: background 0.2s;
             margin-bottom: 20px;
-            padding: 5px 20px;
-            border-bottom: 1px solid transparent;
-            min-width: 150px;
-            text-align: center;
+        }
+        .name-box:active { background: rgba(255,255,255,0.05); }
+
+        .player-name {
+            font-size: clamp(1.2rem, 3vw, 2.5rem);
+            text-transform: uppercase;
+            color: #888;
+            pointer-events: none; /* Let the name-box handle the tap */
         }
 
-        /* Styling when the name becomes an input */
-        .editing {
-            color: white !important;
-            border-bottom-color: var(--accent-green);
-            user-select: text !important;
-            -webkit-user-select: text !important;
-            outline: none;
-        }
-
+        /* THE SCORE: Reduced max size to prevent collision with name */
         .score-num {
-            font-size: clamp(10rem, 35vw, 45rem);
-            font-weight: 700; line-height: 0.8;
+            font-size: clamp(10rem, 35vw, 38rem); 
+            font-weight: 700; 
+            line-height: 0.8;
             margin: 0; 
             cursor: pointer;
-            text-shadow: 0 0 30px rgba(255,255,255,0.1);
-            transition: transform 0.1s, color 0.1s;
+            text-shadow: 0 0 30px rgba(255,255,255,0.05);
+            transition: color 0.1s, transform 0.1s;
+            z-index: 10;
         }
 
-        .score-num:active { transform: scale(0.95); }
+        .score-num:active { transform: scale(0.96); }
 
     </style>
 </head>
@@ -118,14 +121,14 @@
 
     <div id="orientation-overlay">
         <div style="font-size: 4rem; margin-bottom: 20px;">📱🔄</div>
-        <h2>ROTATE DEVICE</h2>
-        <p style="color: #666;">Scoreboard requires horizontal mode.</p>
+        <h2>PLEASE ROTATE</h2>
+        <p style="color: #666;">Landscape mode is required.</p>
     </div>
 
     <div class="main-wrapper">
         <header class="top-nav">
             <div class="logo-text">CHALKY TROUSERS</div>
-            <div class="nav-controls">
+            <div style="display:flex; gap:10px;">
                 <button class="nav-btn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
                 <button class="nav-btn" style="background:#ff4444; border:none;" onclick="resetGame()">Reset</button>
             </div>
@@ -133,104 +136,82 @@
 
         <main class="scoreboard-area">
             <section class="player-pane">
-                <div class="player-name" id="name1" ondblclick="makeEditable(this)" ontouchstart="handleNameTouch(this)">PLAYER 1</div>
+                <div class="name-box" onpointerdown="editName('name1', event)">
+                    <div class="player-name" id="name1">PLAYER 1</div>
+                </div>
                 
                 <div class="score-num" id="s1" 
-                     onpointerdown="scoreInteractStart(event, 's1')" 
-                     onpointerup="scoreInteractEnd(event, 's1')"
-                     onpointerleave="scoreInteractCancel('s1')">0</div>
+                     onpointerdown="scoreStart(event, 's1')" 
+                     onpointerup="scoreEnd(event, 's1')"
+                     onpointerleave="scoreCancel('s1')">0</div>
             </section>
 
             <section class="player-pane">
-                <div class="player-name" id="name2" ondblclick="makeEditable(this)" ontouchstart="handleNameTouch(this)">PLAYER 2</div>
+                <div class="name-box" onpointerdown="editName('name2', event)">
+                    <div class="player-name" id="name2">PLAYER 2</div>
+                </div>
                 
                 <div class="score-num" id="s2" 
-                     onpointerdown="scoreInteractStart(event, 's2')" 
-                     onpointerup="scoreInteractEnd(event, 's2')"
-                     onpointerleave="scoreInteractCancel('s2')">0</div>
+                     onpointerdown="scoreStart(event, 's2')" 
+                     onpointerup="scoreEnd(event, 's2')"
+                     onpointerleave="scoreCancel('s2')">0</div>
             </section>
         </main>
     </div>
 
     <script>
-        // --- SCORE LOGIC ---
-        let holdTimer;
-        let isLongPress = false;
-
-        function scoreInteractStart(e, id) {
-            e.preventDefault(); // STOPS SEARCH/SELECTION
-            isLongPress = false;
-            document.activeElement.blur(); // Close keyboard
-            
-            holdTimer = setTimeout(() => {
-                isLongPress = true;
-                updateScore(id, -1);
-                provideVisualFeedback(id, '#ff4444');
-            }, 600);
-        }
-
-        function scoreInteractEnd(e, id) {
-            clearTimeout(holdTimer);
-            if (!isLongPress) {
-                updateScore(id, 1);
-                provideVisualFeedback(id, '#22ff6d');
+        // --- NAME LOGIC ---
+        function editName(id, e) {
+            e.stopPropagation(); // CRITICAL: Blocks the score +1
+            const el = document.getElementById(id);
+            const currentName = el.innerText;
+            const newName = prompt("Enter Player Name:", currentName);
+            if (newName !== null && newName.trim() !== "") {
+                el.innerText = newName.toUpperCase();
             }
         }
 
-        function scoreInteractCancel(id) { clearTimeout(holdTimer); }
+        // --- SCORE LOGIC ---
+        let holdTimer;
+        let isHold = false;
 
-        function updateScore(id, amt) {
-            const el = document.getElementById(id);
-            let val = parseInt(el.innerText) + amt;
-            el.innerText = val < 0 ? 0 : val;
+        function scoreStart(e, id) {
+            e.preventDefault(); 
+            isHold = false;
+            holdTimer = setTimeout(() => {
+                isHold = true;
+                changeScore(id, -1);
+                flash(id, '#ff4444');
+            }, 600);
         }
 
-        function provideVisualFeedback(id, color) {
+        function scoreEnd(e, id) {
+            clearTimeout(holdTimer);
+            if (!isHold) {
+                changeScore(id, 1);
+                flash(id, '#22ff6d');
+            }
+        }
+
+        function scoreCancel(id) { clearTimeout(holdTimer); }
+
+        function changeScore(id, n) {
             const el = document.getElementById(id);
-            const originalColor = el.style.color;
+            let v = parseInt(el.innerText) + n;
+            el.innerText = v < 0 ? 0 : v;
+        }
+
+        function flash(id, color) {
+            const el = document.getElementById(id);
+            const old = el.style.color;
             el.style.color = color;
-            setTimeout(() => el.style.color = originalColor, 200);
-            if ("vibrate" in navigator) navigator.vibrate(color === '#ff4444' ? 50 : 20);
-        }
-
-        // --- NAME EDITING LOGIC ---
-        let lastTap = 0;
-        function handleNameTouch(el) {
-            const now = Date.now();
-            if (now - lastTap < 300) makeEditable(el);
-            lastTap = now;
-        }
-
-        function makeEditable(el) {
-            el.contentEditable = "true";
-            el.classList.add('editing');
-            el.focus();
-            
-            // Selection fix for contentEditable
-            const range = document.createRange();
-            range.selectNodeContents(el);
-            const sel = window.getSelection();
-            sel.removeAllRanges();
-            sel.addRange(range);
-
-            el.onblur = () => {
-                el.contentEditable = "false";
-                el.classList.remove('editing');
-            };
-            
-            el.onkeydown = (e) => { if(e.key === 'Enter') el.blur(); };
+            setTimeout(() => el.style.color = old, 200);
+            if ("vibrate" in navigator) navigator.vibrate(color === '#ff4444' ? 40 : 15);
         }
 
         // --- UTILS ---
-        function checkOrientation() {
-            const isPortrait = window.innerHeight > window.innerWidth;
-            document.getElementById('orientation-overlay').style.display = isPortrait ? 'flex' : 'none';
-        }
-        window.addEventListener('resize', checkOrientation);
-        window.addEventListener('load', checkOrientation);
-
         function resetGame() {
-            if (confirm("Reset scores?")) {
+            if (confirm("Reset match?")) {
                 document.getElementById('s1').innerText = "0";
                 document.getElementById('s2').innerText = "0";
             }
@@ -241,6 +222,14 @@
             else document.exitFullscreen();
         }
 
+        function checkOrient() {
+            document.getElementById('orientation-overlay').style.display = 
+                (window.innerHeight > window.innerWidth) ? 'flex' : 'none';
+        }
+        window.addEventListener('resize', checkOrient);
+        window.addEventListener('load', checkOrient);
+
+        // Block long-press menu
         window.oncontextmenu = (e) => { if(e.target.classList.contains('score-num')) e.preventDefault(); };
     </script>
 </body>
