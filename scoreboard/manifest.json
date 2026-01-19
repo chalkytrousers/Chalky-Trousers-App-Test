@@ -1,0 +1,16 @@
+{
+  "short_name": "Scoreboard",
+  "name": "Chalky Scoreboard",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#121212",
+  "theme_color": "#121212",
+  "orientation": "landscape",
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/192",
+      "type": "image/png",
+      "sizes": "192x192"
+    }
+  ]
+}
