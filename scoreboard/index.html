@@ -137,7 +137,6 @@
       padding:10px 12px;
       border-radius:12px;
       cursor:pointer;
-      font-size: see(var(--chip));
       font-size: var(--chip);
       line-height:1;
       user-select:none;
@@ -223,20 +222,25 @@
       outline:none;
     }
 
+    /* FIX: give the score area breathing room to avoid clipping */
     .scoreWrap{
       display:flex;
       align-items:center;
       justify-content:center;
       min-height:0;
       flex:1;
+      padding: 10px 0;
     }
 
+    /* FIX: safer line-height and tiny padding so digits do not get cut off */
     .score{
       font-size: var(--score);
       font-weight: 300;
       letter-spacing: 0.03em;
-      line-height: 0.95;
+      line-height: 1.05;
+      padding: 0.06em 0;
       user-select:none;
+      font-variant-numeric: tabular-nums;
     }
 
     .scoreBtns{
