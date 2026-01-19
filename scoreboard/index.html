@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <link rel="manifest" href="manifest.json?v=3">
+    <link rel="manifest" href="manifest.json?v=4">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -19,7 +19,6 @@
     <style>
         :root {
             --bg-dark: #0f0f0f;
-            --panel-bg: rgba(255, 255, 255, 0.03);
             --accent-green: #4CAF50;
             --accent-red: #ff4444;
             --border-color: rgba(255, 255, 255, 0.1);
@@ -32,147 +31,82 @@
         }
 
         body, html {
-            margin: 0;
-            padding: 0;
-            height: 100dvh;
-            width: 100vw;
+            margin: 0; padding: 0;
+            height: 100dvh; width: 100vw;
             background: var(--bg-dark);
             background-image: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%);
-            color: white;
-            font-family: 'Chakra Petch', sans-serif;
+            color: white; font-family: 'Chakra Petch', sans-serif;
             overflow: hidden;
         }
 
-        /* ENFORCE HORIZONTAL ORIENTATION */
+        /* ENFORCE HORIZONTAL */
         @media (orientation: portrait) {
             #orientation-overlay { display: flex; }
             .main-wrapper { display: none; }
         }
 
         #orientation-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: #000;
-            z-index: 9999;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
+            display: none; position: fixed; inset: 0; background: #000;
+            z-index: 9999; flex-direction: column; justify-content: center;
+            align-items: center; text-align: center;
         }
 
-        /* MAIN APP WRAPPER */
         .main-wrapper {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            width: 100%;
+            display: flex; flex-direction: column;
+            height: 100%; width: 100%;
             padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
 
-        /* NAVIGATION BAR */
         .top-nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 30px;
-            height: 60px;
-            background: rgba(0, 0, 0, 0.2);
-            border-bottom: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 30px; height: 60px;
+            background: rgba(0, 0, 0, 0.2); border-bottom: 1px solid var(--border-color);
         }
 
-        .logo-text {
-            font-size: 1.2rem;
-            font-weight: 700;
-            letter-spacing: 2px;
-            color: rgba(255,255,255,0.7);
-        }
-
+        .logo-text { font-size: 1.2rem; font-weight: 700; letter-spacing: 2px; color: rgba(255,255,255,0.7); }
         .nav-controls { display: flex; gap: 10px; }
 
         .nav-btn {
-            background: #222;
-            border: 1px solid #444;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-family: inherit;
-            font-size: 0.9rem;
-            transition: all 0.2s;
+            background: #222; border: 1px solid #444; color: white;
+            padding: 8px 16px; border-radius: 4px; cursor: pointer;
+            font-family: inherit; font-size: 0.9rem;
         }
 
-        .nav-btn:active { background: #333; }
-        .nav-btn.reset-btn { background: var(--accent-red); border-color: transparent; }
+        .nav-btn.reset-btn { background: var(--accent-red); border: none; }
 
-        /* SCOREBOARD LAYOUT */
-        .scoreboard-area {
-            display: flex;
-            flex: 1;
-            width: 100%;
-        }
+        .scoreboard-area { display: flex; flex: 1; width: 100%; }
 
         .player-pane {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            position: relative;
+            flex: 1; display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
             border-right: 1px solid var(--border-color);
         }
-
         .player-pane:last-child { border-right: none; }
 
-        /* BREAK INDICATOR */
         .break-tag {
-            font-size: 0.8rem;
-            letter-spacing: 3px;
-            color: var(--accent-green);
-            margin-bottom: 10px;
-            opacity: 0;
-            transition: opacity 0.3s;
+            font-size: 0.8rem; letter-spacing: 3px; color: var(--accent-green);
+            margin-bottom: 10px; opacity: 0; transition: opacity 0.3s;
         }
         .break-tag.active { opacity: 1; }
 
-        /* TEXT SCALING */
-        .player-name {
-            font-size: clamp(1rem, 3vw, 2.5rem);
-            text-transform: uppercase;
-            color: #777;
-        }
+        .player-name { font-size: clamp(1rem, 3vw, 2.5rem); text-transform: uppercase; color: #777; }
 
+        /* THE SCORE NUMBER - Only this is tappable for scoring */
         .score-num {
-            font-size: clamp(8rem, 30vw, 38rem);
+            font-size: clamp(10rem, 35vw, 45rem);
             font-weight: 700;
             line-height: 0.8;
             margin: 10px 0;
-            text-shadow: 0 0 30px rgba(255,255,255,0.1);
-        }
-
-        /* SCORE CONTROLS */
-        .score-btns { display: flex; gap: 20px; }
-
-        .control-btn {
-            background: #1a1a1a;
-            border: none;
-            color: white;
-            width: clamp(60px, 10vw, 130px);
-            height: clamp(45px, 8vh, 85px);
-            border-radius: 8px;
-            font-size: 1.8rem;
             cursor: pointer;
-            border-bottom: 5px solid #000;
-            transition: transform 0.05s;
+            text-shadow: 0 0 30px rgba(255,255,255,0.1);
+            transition: transform 0.1s, color 0.1s;
+            position: relative;
         }
 
-        .control-btn:active {
-            transform: translateY(3px);
-            border-bottom-width: 2px;
-        }
-
-        .btn-plus { border-bottom-color: var(--accent-green) !important; }
-        .btn-minus { border-bottom-color: var(--accent-red) !important; }
+        /* Pulse feedback when interacting */
+        .score-num:active { transform: scale(0.95); }
+        .score-plus { color: var(--accent-green) !important; }
+        .score-minus { color: var(--accent-red) !important; }
 
     </style>
 </head>
@@ -198,32 +132,68 @@
             <section class="player-pane" onclick="toggleBreak(1)">
                 <div class="break-tag active" id="break1">● BREAK</div>
                 <div class="player-name">Player 1</div>
-                <div class="score-num" id="s1">0</div>
-                <div class="score-btns">
-                    <button class="control-btn btn-plus" onclick="updateScore('s1', 1); event.stopPropagation();">+</button>
-                    <button class="control-btn btn-minus" onclick="updateScore('s1', -1); event.stopPropagation();">-</button>
-                </div>
+                <div class="score-num" id="s1" 
+                     onpointerdown="scoreInteractStart(event, 's1')" 
+                     onpointerup="scoreInteractEnd(event, 's1')"
+                     onpointerleave="scoreInteractCancel('s1')"
+                     onclick="event.stopPropagation()">0</div>
             </section>
 
             <section class="player-pane" onclick="toggleBreak(2)">
                 <div class="break-tag" id="break2">● BREAK</div>
                 <div class="player-name">Player 2</div>
-                <div class="score-num" id="s2">0</div>
-                <div class="score-btns">
-                    <button class="control-btn btn-plus" onclick="updateScore('s2', 1); event.stopPropagation();">+</button>
-                    <button class="control-btn btn-minus" onclick="updateScore('s2', -1); event.stopPropagation();">-</button>
-                </div>
+                <div class="score-num" id="s2" 
+                     onpointerdown="scoreInteractStart(event, 's2')" 
+                     onpointerup="scoreInteractEnd(event, 's2')"
+                     onpointerleave="scoreInteractCancel('s2')"
+                     onclick="event.stopPropagation()">0</div>
             </section>
         </main>
     </div>
 
     <script>
-        // CORE FUNCTIONS
+        let holdTimer;
+        let isLongPress = false;
+
+        function scoreInteractStart(e, id) {
+            isLongPress = false;
+            // Start a timer for the 'Hold' action
+            holdTimer = setTimeout(() => {
+                isLongPress = true;
+                updateScore(id, -1);
+                provideVisualFeedback(id, 'score-minus');
+            }, 600); // 600ms = Hold duration
+        }
+
+        function scoreInteractEnd(e, id) {
+            clearTimeout(holdTimer);
+            if (!isLongPress) {
+                // It was just a tap
+                updateScore(id, 1);
+                provideVisualFeedback(id, 'score-plus');
+            }
+        }
+
+        function scoreInteractCancel(id) {
+            clearTimeout(holdTimer);
+        }
+
         function updateScore(id, amt) {
             const el = document.getElementById(id);
             let val = parseInt(el.innerText) + amt;
             if (val < 0) val = 0;
             el.innerText = val;
+        }
+
+        function provideVisualFeedback(id, className) {
+            const el = document.getElementById(id);
+            el.classList.add(className);
+            setTimeout(() => el.classList.remove(className), 200);
+            
+            // Haptic feedback for mobile devices
+            if ("vibrate" in navigator) {
+                navigator.vibrate(className === 'score-plus' ? 20 : 50);
+            }
         }
 
         function resetGame() {
@@ -236,8 +206,6 @@
         function swapPlayers() {
             const s1 = document.getElementById('s1'), s2 = document.getElementById('s2');
             [s1.innerText, s2.innerText] = [s2.innerText, s1.innerText];
-            
-            // Swap break indicator as well
             const b1 = document.getElementById('break1'), b2 = document.getElementById('break2');
             const b1Active = b1.classList.contains('active');
             b1.classList.toggle('active', !b1Active);
@@ -257,10 +225,14 @@
             }
         }
 
-        // Prevent zoom on double tap for iOS
-        document.addEventListener('touchstart', (e) => {
-            if (e.touches.length > 1) e.preventDefault();
-        }, { passive: false });
+        // Prevent standard long-press context menu on the scores
+        window.oncontextmenu = function(event) {
+            if (event.target.classList.contains('score-num')) {
+                event.preventDefault();
+                event.stopPropagation();
+                return false;
+            }
+        };
     </script>
 </body>
 </html>
