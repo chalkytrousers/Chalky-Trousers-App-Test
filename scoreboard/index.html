@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <link rel="manifest" href="manifest.json?v=9">
+    <link rel="manifest" href="manifest.json?v=10">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -115,8 +115,10 @@
             text-align: center;
             width: 80%;
             outline: none;
-            user-select: text; /* Allow text selection for editing */
+            margin-bottom: 20px; /* Space to prevent overlap with number */
+            user-select: text;
             -webkit-user-select: text;
+            z-index: 10; /* Ensures it is on top */
         }
 
         .player-name-input:focus {
@@ -124,12 +126,15 @@
             border-bottom: 1px solid var(--border-color);
         }
 
+        /* Only this element triggers the score logic */
         .score-num {
             font-size: clamp(10rem, 35vw, 45rem);
             font-weight: 700; line-height: 0.8;
-            margin: 10px 0; cursor: pointer;
+            margin: 0; 
+            cursor: pointer;
             text-shadow: 0 0 30px rgba(255,255,255,0.1);
             transition: transform 0.1s, color 0.1s;
+            z-index: 5;
         }
 
         .score-num:active { transform: scale(0.95); }
@@ -143,7 +148,7 @@
     <div id="orientation-overlay">
         <div class="rotate-icon">📱🔄</div>
         <h2 style="margin: 0 0 10px;">ROTATE DEVICE</h2>
-        <p style="color: #666; max-width: 80%;">This scoreboard requires horizontal mode for the best view.</p>
+        <p style="color: #666; max-width: 80%;">This scoreboard requires horizontal mode.</p>
     </div>
 
     <div class="main-wrapper">
@@ -157,27 +162,32 @@
 
         <main class="scoreboard-area">
             <section class="player-pane">
-                <input type="text" class="player-name-input" value="Player 1" spellcheck="false">
+                <input type="text" class="player-name-input" value="Player 1" 
+                       spellcheck="false" 
+                       onpointerdown="event.stopPropagation()" 
+                       onpointerup="event.stopPropagation()">
+                
                 <div class="score-num" id="s1" 
                      onpointerdown="scoreInteractStart(event, 's1')" 
                      onpointerup="scoreInteractEnd(event, 's1')"
-                     onpointerleave="scoreInteractCancel('s1')"
-                     onclick="event.stopPropagation()">0</div>
+                     onpointerleave="scoreInteractCancel('s1')">0</div>
             </section>
 
             <section class="player-pane">
-                <input type="text" class="player-name-input" value="Player 2" spellcheck="false">
+                <input type="text" class="player-name-input" value="Player 2" 
+                       spellcheck="false" 
+                       onpointerdown="event.stopPropagation()" 
+                       onpointerup="event.stopPropagation()">
+                
                 <div class="score-num" id="s2" 
                      onpointerdown="scoreInteractStart(event, 's2')" 
                      onpointerup="scoreInteractEnd(event, 's2')"
-                     onpointerleave="scoreInteractCancel('s2')"
-                     onclick="event.stopPropagation()">0</div>
+                     onpointerleave="scoreInteractCancel('s2')">0</div>
             </section>
         </main>
     </div>
 
     <script>
-        // JS Fallback for orientation
         function checkOrientation() {
             const overlay = document.getElementById('orientation-overlay');
             const wrapper = document.querySelector('.main-wrapper');
@@ -193,11 +203,11 @@
         window.addEventListener('resize', checkOrientation);
         window.addEventListener('load', checkOrientation);
 
-        // --- INTERACTION LOGIC ---
         let holdTimer;
         let isLongPress = false;
 
         function scoreInteractStart(e, id) {
+            e.stopPropagation(); // Stop Pane interaction
             isLongPress = false;
             holdTimer = setTimeout(() => {
                 isLongPress = true;
@@ -207,6 +217,7 @@
         }
 
         function scoreInteractEnd(e, id) {
+            e.stopPropagation(); // Stop Pane interaction
             clearTimeout(holdTimer);
             if (!isLongPress) {
                 updateScore(id, 1);
@@ -249,7 +260,6 @@
             }
         }
 
-        // Prevent standard long-press context menu on the scores
         window.oncontextmenu = function(event) {
             if (event.target.classList.contains('score-num')) {
                 event.preventDefault();
