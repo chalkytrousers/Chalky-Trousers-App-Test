@@ -4,154 +4,263 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="manifest.json?v=3">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Scoreboard">
+    <meta name="theme-color" content="#0f0f0f">
 
-    <title>Chalky Scoreboard</title>
+    <title>Scoreboard Pro</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --bg-dark: #0a0a0a;
+            --bg-dark: #0f0f0f;
+            --panel-bg: rgba(255, 255, 255, 0.03);
             --accent-green: #4CAF50;
-            --accent-red: #cc3333;
+            --accent-red: #ff4444;
+            --border-color: rgba(255, 255, 255, 0.1);
         }
 
-        * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
-        
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
         body, html {
-            margin: 0; padding: 0; 
-            height: 100dvh; width: 100vw;
+            margin: 0;
+            padding: 0;
+            height: 100dvh;
+            width: 100vw;
             background: var(--bg-dark);
-            color: white; font-family: 'Chakra Petch', sans-serif;
-            overflow: hidden; 
+            background-image: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%);
+            color: white;
+            font-family: 'Chakra Petch', sans-serif;
+            overflow: hidden;
         }
 
-        /* The Container - Always Horizontal logic */
-        .app-wrapper {
+        /* ENFORCE HORIZONTAL ORIENTATION */
+        @media (orientation: portrait) {
+            #orientation-overlay { display: flex; }
+            .main-wrapper { display: none; }
+        }
+
+        #orientation-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 9999;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        /* MAIN APP WRAPPER */
+        .main-wrapper {
             display: flex;
             flex-direction: column;
             height: 100%;
             width: 100%;
-            /* Adds padding for iPhone notches/dynamic islands */
             padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
 
-        .top-bar {
-            display: flex; justify-content: flex-end; align-items: center;
-            padding: 10px 20px; gap: 10px; height: 50px;
+        /* NAVIGATION BAR */
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 30px;
+            height: 60px;
+            background: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid var(--border-color);
         }
 
-        .bar-btn {
-            background: #222; border: 1px solid #444; color: white;
-            padding: 6px 12px; border-radius: 4px; font-family: inherit;
+        .logo-text {
+            font-size: 1.2rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: rgba(255,255,255,0.7);
         }
 
-        .scoreboard { display: flex; flex: 1; width: 100%; }
+        .nav-controls { display: flex; gap: 10px; }
+
+        .nav-btn {
+            background: #222;
+            border: 1px solid #444;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:active { background: #333; }
+        .nav-btn.reset-btn { background: var(--accent-red); border-color: transparent; }
+
+        /* SCOREBOARD LAYOUT */
+        .scoreboard-area {
+            display: flex;
+            flex: 1;
+            width: 100%;
+        }
 
         .player-pane {
-            flex: 1; display: flex; flex-direction: column;
-            justify-content: center; align-items: center;
-            border-right: 1px solid rgba(255,255,255,0.05);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            border-right: 1px solid var(--border-color);
         }
 
-        .break-indicator {
-            font-size: 0.7rem; color: var(--accent-green);
-            visibility: hidden; margin-bottom: 5px;
-        }
-        .break-indicator.active { visibility: visible; }
+        .player-pane:last-child { border-right: none; }
 
-        .name { font-size: clamp(1rem, 2.5vw, 2rem); color: #888; text-transform: uppercase; }
-        
-        /* THE SCORE: This is the part that mimics your TV reference */
-        .score { 
-            font-size: clamp(8rem, 25vw, 35rem); 
-            font-weight: 700; 
-            line-height: 0.8; 
-            margin: 5px 0; 
+        /* BREAK INDICATOR */
+        .break-tag {
+            font-size: 0.8rem;
+            letter-spacing: 3px;
+            color: var(--accent-green);
+            margin-bottom: 10px;
+            opacity: 0;
+            transition: opacity 0.3s;
         }
+        .break-tag.active { opacity: 1; }
 
-        .controls { display: flex; gap: 15px; }
-        .btn {
-            background: #1a1a1a; border: none; color: white;
-            width: clamp(50px, 8vw, 100px); height: clamp(40px, 7vh, 70px);
-            font-size: 1.2rem; border-radius: 6px;
-            border-bottom: 3px solid #333;
-        }
-        .btn.plus { border-bottom-color: var(--accent-green); }
-        .btn.minus { border-bottom-color: var(--accent-red); }
-
-        /* ORIENTATION ENFORCER */
-        @media (orientation: portrait) {
-            #rotate-message { display: flex; }
-            .app-wrapper { display: none; }
+        /* TEXT SCALING */
+        .player-name {
+            font-size: clamp(1rem, 3vw, 2.5rem);
+            text-transform: uppercase;
+            color: #777;
         }
 
-        #rotate-message {
-            display: none; position: fixed; inset: 0; background: #000;
-            z-index: 1000; flex-direction: column; justify-content: center;
-            align-items: center; text-align: center; padding: 20px;
+        .score-num {
+            font-size: clamp(8rem, 30vw, 38rem);
+            font-weight: 700;
+            line-height: 0.8;
+            margin: 10px 0;
+            text-shadow: 0 0 30px rgba(255,255,255,0.1);
         }
+
+        /* SCORE CONTROLS */
+        .score-btns { display: flex; gap: 20px; }
+
+        .control-btn {
+            background: #1a1a1a;
+            border: none;
+            color: white;
+            width: clamp(60px, 10vw, 130px);
+            height: clamp(45px, 8vh, 85px);
+            border-radius: 8px;
+            font-size: 1.8rem;
+            cursor: pointer;
+            border-bottom: 5px solid #000;
+            transition: transform 0.05s;
+        }
+
+        .control-btn:active {
+            transform: translateY(3px);
+            border-bottom-width: 2px;
+        }
+
+        .btn-plus { border-bottom-color: var(--accent-green) !important; }
+        .btn-minus { border-bottom-color: var(--accent-red) !important; }
+
     </style>
 </head>
 <body>
 
-    <div id="rotate-message">
-        <div style="font-size: 3rem; margin-bottom: 20px;">🔄</div>
-        <h2>Please rotate to Landscape</h2>
-        <p>This scoreboard is designed for horizontal view only.</p>
+    <div id="orientation-overlay">
+        <div style="font-size: 4rem;">📱🔄</div>
+        <h2 style="margin: 20px 0 10px;">ROTATE DEVICE</h2>
+        <p style="color: #666;">This scoreboard requires horizontal mode.</p>
     </div>
 
-    <div class="app-wrapper">
-        <header class="top-bar">
-            <button class="bar-btn" onclick="swap()">Swap</button>
-            <button class="bar-btn" style="background: var(--accent-red);" onclick="reset()">Reset</button>
+    <div class="main-wrapper">
+        <header class="top-nav">
+            <div class="logo-text">SCOREBOARD</div>
+            <div class="nav-controls">
+                <button class="nav-btn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+                <button class="nav-btn" onclick="swapPlayers()">Swap</button>
+                <button class="nav-btn reset-btn" onclick="resetGame()">Reset</button>
+            </div>
         </header>
 
-        <main class="scoreboard">
-            <section class="player-pane">
-                <div class="break-indicator active" id="b1">● BREAK</div>
-                <div class="name">Player 1</div>
-                <div class="score" id="s1">0</div>
-                <div class="controls">
-                    <button class="btn minus" onclick="change('s1',-1)">-1</button>
-                    <button class="btn plus" onclick="change('s1',1)">+1</button>
+        <main class="scoreboard-area">
+            <section class="player-pane" onclick="toggleBreak(1)">
+                <div class="break-tag active" id="break1">● BREAK</div>
+                <div class="player-name">Player 1</div>
+                <div class="score-num" id="s1">0</div>
+                <div class="score-btns">
+                    <button class="control-btn btn-plus" onclick="updateScore('s1', 1); event.stopPropagation();">+</button>
+                    <button class="control-btn btn-minus" onclick="updateScore('s1', -1); event.stopPropagation();">-</button>
                 </div>
             </section>
 
-            <section class="player-pane" style="border-right: none;">
-                <div class="break-indicator" id="b2">● BREAK</div>
-                <div class="name">Player 2</div>
-                <div class="score" id="s2">0</div>
-                <div class="controls">
-                    <button class="btn minus" onclick="change('s2',-1)">-1</button>
-                    <button class="btn plus" onclick="change('s2',1)">+1</button>
+            <section class="player-pane" onclick="toggleBreak(2)">
+                <div class="break-tag" id="break2">● BREAK</div>
+                <div class="player-name">Player 2</div>
+                <div class="score-num" id="s2">0</div>
+                <div class="score-btns">
+                    <button class="control-btn btn-plus" onclick="updateScore('s2', 1); event.stopPropagation();">+</button>
+                    <button class="control-btn btn-minus" onclick="updateScore('s2', -1); event.stopPropagation();">-</button>
                 </div>
             </section>
         </main>
     </div>
 
     <script>
-        function change(id, n) {
+        // CORE FUNCTIONS
+        function updateScore(id, amt) {
             const el = document.getElementById(id);
-            let v = parseInt(el.innerText) + n;
-            el.innerText = v < 0 ? 0 : v;
+            let val = parseInt(el.innerText) + amt;
+            if (val < 0) val = 0;
+            el.innerText = val;
         }
 
-        function reset() {
-            if(confirm("Reset?")) {
+        function resetGame() {
+            if (confirm("Reset scores to zero?")) {
                 document.getElementById('s1').innerText = "0";
                 document.getElementById('s2').innerText = "0";
             }
         }
 
-        function swap() {
+        function swapPlayers() {
             const s1 = document.getElementById('s1'), s2 = document.getElementById('s2');
             [s1.innerText, s2.innerText] = [s2.innerText, s1.innerText];
+            
+            // Swap break indicator as well
+            const b1 = document.getElementById('break1'), b2 = document.getElementById('break2');
+            const b1Active = b1.classList.contains('active');
+            b1.classList.toggle('active', !b1Active);
+            b2.classList.toggle('active', b1Active);
         }
+
+        function toggleBreak(player) {
+            document.getElementById('break1').classList.toggle('active', player === 1);
+            document.getElementById('break2').classList.toggle('active', player === 2);
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(e => console.log(e));
+            } else {
+                document.exitFullscreen();
+            }
+        }
+
+        // Prevent zoom on double tap for iOS
+        document.addEventListener('touchstart', (e) => {
+            if (e.touches.length > 1) e.preventDefault();
+        }, { passive: false });
     </script>
 </body>
 </html>
