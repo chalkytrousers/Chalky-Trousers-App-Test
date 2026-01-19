@@ -1,690 +1,96 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#0b0f12" />
-  <title>Pool Scoreboard</title>
-  <style>
-    :root{
-      --bg:#070a0c;
-      --panel:#0b0f12;
-      --panel2:#0a0d10;
-      --text:#e8eef4;
-      --muted:#94a3b8;
-      --accent:#21c48c;
-      --danger:#ff5a5f;
-      --line:rgba(255,255,255,0.10);
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Simple Dynamic Scoreboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;700&display=swap" rel="stylesheet">
 
-      /* Reference canvas for consistent scaling across devices */
-      --refW: 1280;
-      --refH: 720;
+    <style>
+        /* --- Basic Reset to remove default browser margins --- */
+        * {
+            box-sizing: border-box;
+        }
+        
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%; /* Crucial for full screen */
+            width: 100%;
+            background-color: #121212; /* Deep dark background like reference image */
+            /* A subtle gradient to give it depth */
+            background-image: linear-gradient(to bottom, #1a1a1a, #0d0d0d);
+            color: #ffffff;
+            font-family: 'Chakra Petch', sans-serif;
+            overflow: hidden; /* Prevents scrolling */
+        }
 
-      --radius:16px;
-      --pad:16px;
+        /* --- The Main Container --- */
+        .scoreboard-container {
+            display: flex; /* This puts the two players side-by-side */
+            height: 100vh; /* Takes up 100% of the Viewport Height */
+            width: 100%;
+        }
 
-      /* Dynamic typography */
-      --title: clamp(18px, 2.2vw, 26px);
-      --label: clamp(14px, 1.6vw, 18px);
-      --score: clamp(120px, 18vw, 320px);
-      --name: clamp(18px, 2.4vw, 34px);
-      --chip: clamp(12px, 1.2vw, 14px);
+        /* --- The Two Player Columns --- */
+        .player-column {
+            flex: 1; /* Both columns take equal width */
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Center content vertically */
+            align-items: center; /* Center content horizontally */
+            position: relative;
+        }
 
-      /* Safe area */
-      --sat: env(safe-area-inset-top, 0px);
-      --sar: env(safe-area-inset-right, 0px);
-      --sab: env(safe-area-inset-bottom, 0px);
-      --sal: env(safe-area-inset-left, 0px);
+        /* A subtle divider line between the two */
+        .player-column:first-child {
+            border-right: 2px solid rgba(255,255,255,0.1);
+        }
 
-      /* Banner heights inside the scaled app canvas */
-      --topBannerH: 56px;
-      --bottomBannerH: 64px;
-    }
+        /* --- TYPOGRAPHY - THE MAGIC PART --- */
 
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      background: radial-gradient(1200px 600px at 50% 0%, rgba(33,196,140,0.10), rgba(0,0,0,0)) , var(--bg);
-      color:var(--text);
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
-      overflow:hidden;
-    }
+        /* Player Names */
+        .player-name {
+            /* clamp(minimum size, dynamic size based on screen width, maximum size) */
+            /* This ensures names are readable on phones but huge on TVs */
+            font-size: clamp(1.5rem, 5vw, 5rem);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: rgba(255,255,255,0.6); /* Slightly muted color */
+            margin-bottom: 2vh; /* Spacing using viewport height units */
+            text-align: center;
+        }
 
-    /* Outer viewport uses svh to avoid iOS URL bar issues */
-    .viewport{
-      height: 100svh;
-      padding: calc(var(--pad) + var(--sat)) calc(var(--pad) + var(--sar)) calc(var(--pad) + var(--sab)) calc(var(--pad) + var(--sal));
-      display:flex;
-      align-items:stretch;
-      justify-content:center;
-    }
+        /* The Scores */
+        .score-display {
+            /* This is the key to the TV display issue. 
+               25vw means the font is 25% of the total screen width. */
+            font-size: clamp(8rem, 30vw, 35rem);
+            font-weight: 700;
+            line-height: 0.9;
+            /* A slight text shadow for that glowing digital look */
+            text-shadow: 0 0 20px rgba(255,255,255,0.2);
+        }
 
-    /* Scaler normalizes UI size across phone/tablet/TV */
-    .scaler{
-      width:100%;
-      height:100%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-
-    .app{
-      width: min(100%, calc(var(--refW) * 1px));
-      height: min(100%, calc(var(--refH) * 1px));
-      transform-origin: center;
-      background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0)) , var(--panel);
-      border: 1px solid var(--line);
-      border-radius: calc(var(--radius) + 6px);
-      overflow:hidden;
-      box-shadow: 0 20px 80px rgba(0,0,0,0.6);
-      display:flex;
-      flex-direction:column;
-    }
-
-    /* TOP BLANK BANNER */
-    .topBanner{
-      height: var(--topBannerH);
-      border-bottom: 1px solid var(--line);
-      background: rgba(255,255,255,0.01);
-    }
-
-    .topbar{
-      display:flex;
-      gap:12px;
-      align-items:center;
-      justify-content:space-between;
-      padding: 14px 16px;
-      border-bottom:1px solid var(--line);
-      background: rgba(255,255,255,0.02);
-      backdrop-filter: blur(10px);
-    }
-
-    .leftControls, .rightControls{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      min-width: 280px;
-    }
-    .rightControls{justify-content:flex-end}
-
-    .select{
-      appearance:none;
-      -webkit-appearance:none;
-      background: var(--panel2);
-      border:1px solid var(--line);
-      color:var(--text);
-      padding:10px 38px 10px 12px;
-      border-radius:12px;
-      font-size: var(--label);
-      outline:none;
-      cursor:pointer;
-    }
-    .selectWrap{position:relative; display:inline-flex; align-items:center;}
-    .selectWrap:after{
-      content:"▾";
-      position:absolute;
-      right:12px;
-      color: var(--muted);
-      pointer-events:none;
-      font-size: 14px;
-    }
-
-    .btn{
-      border:1px solid var(--line);
-      background: var(--panel2);
-      color: var(--text);
-      padding:10px 12px;
-      border-radius:12px;
-      cursor:pointer;
-      font-size: var(--chip);
-      line-height:1;
-      user-select:none;
-      touch-action: manipulation;
-    }
-    .btn:active{transform: translateY(1px)}
-    .btn.primary{border-color: rgba(33,196,140,0.45); box-shadow: 0 0 0 3px rgba(33,196,140,0.12) inset;}
-    .btn.danger{border-color: rgba(255,90,95,0.45);}
-
-    .mid{
-      flex:1;
-      display:grid;
-      grid-template-columns: 1fr 1px 1fr;
-      align-items:stretch;
-      min-height:0;
-    }
-    .divider{
-      background: linear-gradient(180deg, rgba(255,255,255,0), rgba(255,255,255,0.16), rgba(255,255,255,0));
-    }
-
-    .side{
-      padding: 22px 22px 18px 22px;
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
-      min-width:0;
-      gap:14px;
-    }
-
-    .meta{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:10px;
-      min-width:0;
-    }
-
-    .breakTag{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      color: var(--muted);
-      font-size: var(--chip);
-      white-space:nowrap;
-    }
-    .dot{
-      width:10px;
-      height:10px;
-      border-radius:999px;
-      background: rgba(255,255,255,0.2);
-      box-shadow: 0 0 0 4px rgba(255,255,255,0.04);
-      flex:0 0 auto;
-    }
-    .dot.on{
-      background: var(--accent);
-      box-shadow: 0 0 0 4px rgba(33,196,140,0.12);
-    }
-
-    .playerBlock{
-      min-width:0;
-      display:flex;
-      flex-direction:column;
-      gap:6px;
-    }
-
-    .playerLabel{
-      color: rgba(255,255,255,0.62);
-      font-size: var(--label);
-      letter-spacing:0.18em;
-      text-transform:uppercase;
-    }
-    .nameInput{
-      width:100%;
-      background: transparent;
-      border: 1px dashed rgba(255,255,255,0.18);
-      border-radius:12px;
-      padding:10px 12px;
-      color: var(--text);
-      font-size: var(--name);
-      font-weight: 700;
-      outline:none;
-    }
-
-    /* FIX: give the score area breathing room to avoid clipping */
-    .scoreWrap{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      min-height:0;
-      flex:1;
-      padding: 10px 0;
-    }
-
-    /* FIX: safer line-height and tiny padding so digits do not get cut off */
-    .score{
-      font-size: var(--score);
-      font-weight: 300;
-      letter-spacing: 0.03em;
-      line-height: 1.05;
-      padding: 0.06em 0;
-      user-select:none;
-      font-variant-numeric: tabular-nums;
-    }
-
-    .scoreBtns{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:12px;
-      margin-top:10px;
-    }
-    .scoreBtns .btn{
-      padding:14px 12px;
-      font-size: clamp(14px, 1.6vw, 18px);
-      border-radius:14px;
-    }
-
-    .bottombar{
-      border-top:1px solid var(--line);
-      background: rgba(255,255,255,0.02);
-      padding: 12px 16px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      min-height:56px;
-    }
-
-    .status{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      color: var(--muted);
-      font-size: var(--chip);
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      min-width:0;
-    }
-
-    .modePills{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-      justify-content:flex-end;
-    }
-    .pill{
-      border:1px solid var(--line);
-      background: rgba(255,255,255,0.03);
-      color: var(--text);
-      padding:8px 10px;
-      border-radius:999px;
-      font-size: var(--chip);
-      cursor:pointer;
-      user-select:none;
-      touch-action: manipulation;
-    }
-    .pill.on{
-      border-color: rgba(33,196,140,0.45);
-      box-shadow: 0 0 0 3px rgba(33,196,140,0.10) inset;
-    }
-
-    /* BOTTOM BRAND BANNER */
-    .brandBanner{
-      height: var(--bottomBannerH);
-      border-top: 1px solid var(--line);
-      background: rgba(255,255,255,0.01);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding: 10px 16px;
-    }
-    .brandInner{
-      width:100%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:12px;
-      min-width:0;
-    }
-    .logoBox{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      padding:10px 14px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,0.10);
-      background: rgba(0,0,0,0.18);
-      max-width: 100%;
-    }
-    .logoText{
-      font-weight: 800;
-      letter-spacing: 0.10em;
-      text-transform: uppercase;
-      font-size: clamp(12px, 1.5vw, 18px);
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-    .logoSub{
-      font-size: clamp(10px, 1.1vw, 13px);
-      color: var(--muted);
-      letter-spacing: 0.08em;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-    .logoMark{
-      width: 26px;
-      height: 26px;
-      flex: 0 0 auto;
-    }
-
-    /* Compact mode */
-    body.compact .topBanner{height: 42px}
-    body.compact .topbar{padding:10px 12px}
-    body.compact .side{padding:16px}
-    body.compact .bottombar{padding:10px 12px}
-    body.compact .brandBanner{height: 52px}
-
-    /* TV mode */
-    body.tv{
-      --label: clamp(16px, 1.8vw, 22px);
-      --name: clamp(22px, 2.8vw, 42px);
-      --chip: clamp(13px, 1.3vw, 16px);
-      --score: clamp(140px, 20vw, 360px);
-      --topBannerH: 70px;
-      --bottomBannerH: 80px;
-    }
-
-    /* Small screens: vertical stack */
-    @media (max-aspect-ratio: 10/16){
-      .app{width:100%; height:100%;}
-      .mid{
-        grid-template-columns: 1fr;
-        grid-template-rows: 1fr 1px 1fr;
-      }
-      .divider{background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.16), rgba(255,255,255,0));}
-    }
-  </style>
+    </style>
 </head>
 <body>
-  <div class="viewport">
-    <div class="scaler">
-      <div class="app" id="app">
-        <!-- TOP BLANK BANNER -->
-        <div class="topBanner" aria-hidden="true"></div>
 
-        <div class="topbar">
-          <div class="leftControls">
-            <div class="selectWrap">
-              <select class="select" id="gameType">
-                <option value="9">9-Ball</option>
-                <option value="8">8-Ball</option>
-                <option value="10">10-Ball</option>
-                <option value="uk8">UK 8-Ball</option>
-                <option value="race">Race</option>
-              </select>
-            </div>
-            <button class="btn" id="swapBtn" title="Swap players">Swap</button>
-            <button class="btn" id="breakBtn" title="Toggle break">Break</button>
-          </div>
+    <main class="scoreboard-container">
+        
+        <section class="player-column">
+            <div class="player-name">Player 1</div>
+            <div class="score-display">0</div>
+        </section>
 
-          <div class="rightControls">
-            <button class="btn danger" id="resetBtn" title="Reset scores">Reset</button>
-          </div>
-        </div>
+        <section class="player-column">
+            <div class="player-name">Player 2</div>
+            <div class="score-display">0</div>
+        </section>
 
-        <div class="mid">
-          <div class="side">
-            <div class="meta">
-              <div class="breakTag"><span class="dot" id="dot1"></span><span>BREAK</span></div>
-              <div class="playerBlock">
-                <div class="playerLabel">PLAYER 1</div>
-                <input class="nameInput" id="name1" maxlength="24" autocomplete="off" spellcheck="false" />
-              </div>
-            </div>
+    </main>
 
-            <div class="scoreWrap">
-              <div class="score" id="score1">0</div>
-            </div>
-
-            <div class="scoreBtns">
-              <button class="btn primary" id="p1plus">+1</button>
-              <button class="btn" id="p1minus">-1</button>
-            </div>
-          </div>
-
-          <div class="divider"></div>
-
-          <div class="side">
-            <div class="meta">
-              <div class="breakTag"><span class="dot" id="dot2"></span><span>BREAK</span></div>
-              <div class="playerBlock">
-                <div class="playerLabel">PLAYER 2</div>
-                <input class="nameInput" id="name2" maxlength="24" autocomplete="off" spellcheck="false" />
-              </div>
-            </div>
-
-            <div class="scoreWrap">
-              <div class="score" id="score2">0</div>
-            </div>
-
-            <div class="scoreBtns">
-              <button class="btn primary" id="p2plus">+1</button>
-              <button class="btn" id="p2minus">-1</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="bottombar">
-          <div class="status" id="status"></div>
-          <div class="modePills">
-            <div class="pill" id="fitPill">Fit to screen</div>
-            <div class="pill" id="compactPill">Compact</div>
-            <div class="pill" id="tvPill">TV mode</div>
-            <div class="pill" id="lockPill">Lock</div>
-          </div>
-        </div>
-
-        <!-- BOTTOM BRAND BANNER -->
-        <div class="brandBanner">
-          <div class="brandInner">
-            <div class="logoBox" title="Chalky Trousers">
-              <!-- Placeholder mark. Replace with your actual logo SVG or an <img>. -->
-              <svg class="logoMark" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M7 17c3.5-7.5 7-7.5 10 0" stroke="rgba(255,255,255,0.9)" stroke-width="1.6" stroke-linecap="round"/>
-                <path d="M8.5 7.5h7" stroke="rgba(33,196,140,0.95)" stroke-width="1.8" stroke-linecap="round"/>
-                <circle cx="12" cy="12" r="9" stroke="rgba(255,255,255,0.18)" stroke-width="1.2"/>
-              </svg>
-              <div style="min-width:0">
-                <div class="logoText">Chalky Trousers</div>
-                <div class="logoSub">Scoreboard</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </div>
-
-  <script>
-    const LS_KEY = "pool_scoreboard_v2";
-
-    const el = (id) => document.getElementById(id);
-
-    const state = {
-      gameType: "9",
-      name1: "Player 1",
-      name2: "Player 2",
-      score1: 0,
-      score2: 0,
-      breaker: 1,
-      locked: false,
-      fit: true,
-      compact: false,
-      tv: false
-    };
-
-    function load(){
-      try{
-        const saved = JSON.parse(localStorage.getItem(LS_KEY));
-        if(saved && typeof saved === "object"){
-          Object.assign(state, saved);
-        }
-      }catch(e){}
-    }
-
-    function save(){
-      localStorage.setItem(LS_KEY, JSON.stringify(state));
-      renderStatus();
-    }
-
-    function clampScore(n){
-      if(!Number.isFinite(n)) return 0;
-      return Math.max(0, Math.min(999, Math.round(n)));
-    }
-
-    function render(){
-      el("gameType").value = state.gameType;
-
-      el("name1").value = state.name1 || "Player 1";
-      el("name2").value = state.name2 || "Player 2";
-
-      el("score1").textContent = String(state.score1);
-      el("score2").textContent = String(state.score2);
-
-      el("dot1").classList.toggle("on", state.breaker === 1);
-      el("dot2").classList.toggle("on", state.breaker === 2);
-
-      document.body.classList.toggle("compact", !!state.compact);
-      document.body.classList.toggle("tv", !!state.tv);
-
-      el("fitPill").classList.toggle("on", !!state.fit);
-      el("compactPill").classList.toggle("on", !!state.compact);
-      el("tvPill").classList.toggle("on", !!state.tv);
-      el("lockPill").classList.toggle("on", !!state.locked);
-
-      setLocked(state.locked);
-      applyScale();
-      renderStatus();
-    }
-
-    function renderStatus(){
-      const gt = ({
-        "9":"9-Ball",
-        "8":"8-Ball",
-        "10":"10-Ball",
-        "uk8":"UK 8-Ball",
-        "race":"Race"
-      })[state.gameType] || "Game";
-
-      const lockTxt = state.locked ? "Locked" : "Unlocked";
-      const fitTxt = state.fit ? "Fit on" : "Fit off";
-      const modeTxt = state.tv ? "TV" : (state.compact ? "Compact" : "Normal");
-      const brk = state.breaker === 1 ? (state.name1 || "Player 1") : (state.name2 || "Player 2");
-
-      el("status").textContent = `${gt} | Break: ${brk} | ${modeTxt} | ${fitTxt} | ${lockTxt}`;
-    }
-
-    function setLocked(v){
-      const disabled = !!v;
-      el("gameType").disabled = disabled;
-      el("name1").disabled = disabled;
-      el("name2").disabled = disabled;
-
-      const btnIds = ["swapBtn","breakBtn","resetBtn","p1plus","p1minus","p2plus","p2minus"];
-      btnIds.forEach(id => {
-        el(id).disabled = disabled;
-        el(id).style.opacity = disabled ? 0.45 : 1;
-      });
-    }
-
-    function applyScale(){
-      const app = el("app");
-      if(!state.fit){
-        app.style.transform = "";
-        return;
-      }
-
-      const refW = 1280;
-      const refH = 720;
-
-      const container = document.querySelector(".scaler");
-      const cw = container.clientWidth;
-      const ch = container.clientHeight;
-
-      const s = Math.min(cw / refW, ch / refH);
-      app.style.transform = `scale(${s})`;
-    }
-
-    function bump(player, delta){
-      if(state.locked) return;
-      if(player === 1){
-        state.score1 = clampScore(state.score1 + delta);
-      }else{
-        state.score2 = clampScore(state.score2 + delta);
-      }
-      save();
-      render();
-    }
-
-    function swapPlayers(){
-      if(state.locked) return;
-      [state.name1, state.name2] = [state.name2, state.name1];
-      [state.score1, state.score2] = [state.score2, state.score1];
-      state.breaker = state.breaker === 1 ? 2 : 1;
-      save();
-      render();
-    }
-
-    function toggleBreak(){
-      if(state.locked) return;
-      state.breaker = state.breaker === 1 ? 2 : 1;
-      save();
-      render();
-    }
-
-    function resetScores(){
-      if(state.locked) return;
-      state.score1 = 0;
-      state.score2 = 0;
-      save();
-      render();
-    }
-
-    function bind(){
-      el("gameType").addEventListener("change", (e) => {
-        if(state.locked) return;
-        state.gameType = e.target.value;
-        save(); render();
-      });
-
-      el("name1").addEventListener("input", (e) => {
-        if(state.locked) return;
-        state.name1 = e.target.value.slice(0, 24);
-        save(); render();
-      });
-      el("name2").addEventListener("input", (e) => {
-        if(state.locked) return;
-        state.name2 = e.target.value.slice(0, 24);
-        save(); render();
-      });
-
-      el("p1plus").addEventListener("click", () => bump(1, +1));
-      el("p1minus").addEventListener("click", () => bump(1, -1));
-      el("p2plus").addEventListener("click", () => bump(2, +1));
-      el("p2minus").addEventListener("click", () => bump(2, -1));
-
-      el("swapBtn").addEventListener("click", swapPlayers);
-      el("breakBtn").addEventListener("click", toggleBreak);
-      el("resetBtn").addEventListener("click", resetScores);
-
-      el("fitPill").addEventListener("click", () => {
-        state.fit = !state.fit;
-        save(); render();
-      });
-      el("compactPill").addEventListener("click", () => {
-        state.compact = !state.compact;
-        save(); render();
-      });
-      el("tvPill").addEventListener("click", () => {
-        state.tv = !state.tv;
-        save(); render();
-      });
-      el("lockPill").addEventListener("click", () => {
-        state.locked = !state.locked;
-        save(); render();
-      });
-
-      window.addEventListener("resize", () => applyScale());
-      window.addEventListener("orientationchange", () => setTimeout(applyScale, 150));
-
-      // Prevent iOS double-tap zoom quirks on controls
-      document.addEventListener("touchend", (e) => {
-        const now = Date.now();
-        if(document._lastTouchEnd && (now - document._lastTouchEnd) <= 300){
-          e.preventDefault();
-        }
-        document._lastTouchEnd = now;
-      }, { passive:false });
-    }
-
-    load();
-    bind();
-    render();
-  </script>
 </body>
 </html>
