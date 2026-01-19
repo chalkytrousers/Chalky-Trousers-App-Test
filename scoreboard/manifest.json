@@ -1,16 +1,24 @@
 {
   "short_name": "Scoreboard",
   "name": "Chalky Scoreboard",
-  "start_url": ".",
-  "display": "standalone",
-  "background_color": "#121212",
-  "theme_color": "#121212",
-  "orientation": "landscape",
   "icons": [
     {
-      "src": "https://via.placeholder.com/192",
+      "src": "https://via.placeholder.com/192.png",
       "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://via.placeholder.com/512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any"
     }
-  ]
+  ],
+  "start_url": "./index.html",
+  "background_color": "#0f0f0f",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#0f0f0f",
+  "orientation": "landscape"
 }
