@@ -3,94 +3,181 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Simple Dynamic Scoreboard</title>
+    
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Dynamic Scoreboard</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
-        /* --- Basic Reset to remove default browser margins --- */
+        :root {
+            --bg-dark: #121212;
+            --accent-green: #4CAF50;
+            --accent-red: #f44336;
+            --text-main: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.5);
+        }
+
         * {
             box-sizing: border-box;
+            user-select: none; /* Prevents text selection while tapping buttons */
         }
-        
+
         body, html {
             margin: 0;
             padding: 0;
-            height: 100%; /* Crucial for full screen */
+            height: 100dvh; /* Dynamic Viewport Height for mobile browsers */
             width: 100%;
-            background-color: #121212; /* Deep dark background like reference image */
-            /* A subtle gradient to give it depth */
-            background-image: linear-gradient(to bottom, #1a1a1a, #0d0d0d);
-            color: #ffffff;
+            background: var(--bg-dark);
+            background-image: radial-gradient(circle at center, #1e1e1e 0%, #0a0a0a 100%);
+            color: var(--text-main);
             font-family: 'Chakra Petch', sans-serif;
-            overflow: hidden; /* Prevents scrolling */
-        }
-
-        /* --- The Main Container --- */
-        .scoreboard-container {
-            display: flex; /* This puts the two players side-by-side */
-            height: 100vh; /* Takes up 100% of the Viewport Height */
-            width: 100%;
-        }
-
-        /* --- The Two Player Columns --- */
-        .player-column {
-            flex: 1; /* Both columns take equal width */
+            overflow: hidden;
             display: flex;
             flex-direction: column;
-            justify-content: center; /* Center content vertically */
-            align-items: center; /* Center content horizontally */
-            position: relative;
         }
 
-        /* A subtle divider line between the two */
-        .player-column:first-child {
-            border-right: 2px solid rgba(255,255,255,0.1);
+        /* Fullscreen Toggle Button - Subtle and out of the way */
+        #fs-toggle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 100;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
         }
 
-        /* --- TYPOGRAPHY - THE MAGIC PART --- */
+        /* Main Layout */
+        .scoreboard {
+            display: flex;
+            flex: 1;
+            width: 100%;
+            height: 100%;
+        }
 
-        /* Player Names */
-        .player-name {
-            /* clamp(minimum size, dynamic size based on screen width, maximum size) */
-            /* This ensures names are readable on phones but huge on TVs */
-            font-size: clamp(1.5rem, 5vw, 5rem);
+        .player-pane {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-right: 1px solid rgba(255,255,255,0.05);
+            transition: background 0.3s ease;
+        }
+
+        .player-pane:last-child {
+            border-right: none;
+        }
+
+        /* Typography that scales perfectly */
+        .name {
+            font-size: clamp(1.2rem, 4vw, 3rem);
+            color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: rgba(255,255,255,0.6); /* Slightly muted color */
-            margin-bottom: 2vh; /* Spacing using viewport height units */
-            text-align: center;
+            letter-spacing: 2px;
+            margin-bottom: 1vh;
         }
 
-        /* The Scores */
-        .score-display {
-            /* This is the key to the TV display issue. 
-               25vw means the font is 25% of the total screen width. */
-            font-size: clamp(8rem, 30vw, 35rem);
+        .score {
+            /* 35vw ensures it fills the width, clamp keeps it within bounds */
+            font-size: clamp(10rem, 30vw, 40rem);
             font-weight: 700;
-            line-height: 0.9;
-            /* A slight text shadow for that glowing digital look */
-            text-shadow: 0 0 20px rgba(255,255,255,0.2);
+            line-height: 0.8;
+            margin: 2vh 0;
         }
 
+        /* Interactive Controls */
+        .controls {
+            display: flex;
+            gap: 20px;
+        }
+
+        .btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: white;
+            padding: clamp(10px, 2vh, 30px) clamp(20px, 4vw, 60px);
+            font-size: clamp(1rem, 2vw, 2rem);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.1s active;
+        }
+
+        .btn:active {
+            background: rgba(255,255,255,0.2);
+            transform: scale(0.95);
+        }
+
+        .btn.plus { border-bottom: 4px solid var(--accent-green); }
+        .btn.minus { border-bottom: 4px solid var(--accent-red); }
+
+        /* Hide buttons when in a 'TV Display' mode if you wanted a clean look */
+        .tv-mode .controls {
+            display: none;
+        }
     </style>
 </head>
 <body>
 
-    <main class="scoreboard-container">
-        
-        <section class="player-column">
-            <div class="player-name">Player 1</div>
-            <div class="score-display">0</div>
+    <button id="fs-toggle">⛶ Fullscreen</button>
+
+    <main class="scoreboard">
+        <section class="player-pane">
+            <div class="name">Player 1</div>
+            <div class="score" id="score1">0</div>
+            <div class="controls">
+                <button class="btn minus" onclick="changeScore('score1', -1)">-1</button>
+                <button class="btn plus" onclick="changeScore('score1', 1)">+1</button>
+            </div>
         </section>
 
-        <section class="player-column">
-            <div class="player-name">Player 2</div>
-            <div class="score-display">0</div>
+        <section class="player-pane">
+            <div class="name">Player 2</div>
+            <div class="score" id="score2">0</div>
+            <div class="controls">
+                <button class="btn minus" onclick="changeScore('score2', -1)">-1</button>
+                <button class="btn plus" onclick="changeScore('score2', 1)">+1</button>
+            </div>
         </section>
-
     </main>
 
+    <script>
+        // Score Logic
+        function changeScore(id, amount) {
+            const element = document.getElementById(id);
+            let current = parseInt(element.innerText);
+            let next = current + amount;
+            if (next < 0) next = 0; // Prevent negative scores
+            element.innerText = next;
+        }
+
+        // Fullscreen Logic
+        const fsBtn = document.getElementById('fs-toggle');
+        fsBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log("Fullscreen failed");
+                });
+                fsBtn.innerText = "✕ Exit";
+            } else {
+                document.exitFullscreen();
+                fsBtn.innerText = "⛶ Fullscreen";
+            }
+        });
+
+        // Double tap prevention for iOS
+        document.addEventListener('touchstart', (e) => {
+            if (e.touches.length > 1) e.preventDefault();
+        }, { passive: false });
+    </script>
 </body>
 </html>
