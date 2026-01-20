@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <link rel="manifest" href="manifest.json?v=32">
+    <link rel="manifest" href="manifest.json?v=33">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -21,11 +21,11 @@
             --bg-dark: #000000;
             --banner-bg: #111111;
             --accent-green: #22ff6d;
-            --accent-red: #ff4444;
+            --accent-red-subtle: rgba(255, 68, 68, 0.2);
             --border-color: rgba(255, 255, 255, 0.1);
             --middle-width: clamp(70px, 10vw, 110px);
             --nav-h: 45px;
-            --name-h: 45px;
+            --name-h: 55px; /* Slightly taller for bigger names */
         }
 
         * {
@@ -45,6 +45,7 @@
             position: fixed; 
         }
 
+        /* ORIENTATION PROMPT */
         #orientation-overlay {
             display: none; position: fixed; inset: 0; background: #000;
             z-index: 10000; flex-direction: column; justify-content: center;
@@ -64,6 +65,7 @@
             padding-bottom: env(safe-area-inset-bottom);
         }
 
+        /* TOP NAVIGATION */
         .top-nav {
             display: flex; justify-content: space-between; align-items: center;
             padding: 0 20px; height: var(--nav-h);
@@ -71,16 +73,22 @@
             position: relative; z-index: 100; flex-shrink: 0;
         }
 
-        .logo-text { font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; color: rgba(255,255,255,0.4); }
+        .logo-text { font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; color: rgba(255,255,255,0.3); }
         
         .nav-btn {
-            background: #222; border: 1px solid #444; color: white;
-            padding: 5px 12px; border-radius: 4px; cursor: pointer; font-family: inherit; font-size: 0.75rem;
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #888;
+            padding: 4px 12px; border-radius: 4px; cursor: pointer; font-family: inherit; font-size: 0.7rem;
+            transition: all 0.2s;
         }
-        .nav-btn.reset { background: var(--accent-red); border: none; }
+        .nav-btn.reset { 
+            background: var(--accent-red-subtle); 
+            border: 1px solid rgba(255, 68, 68, 0.3); 
+            color: rgba(255, 255, 255, 0.7);
+        }
 
         #fs-btn { display: none; }
 
+        /* NAMES BANNER */
         .names-banner {
             display: flex; height: var(--name-h);
             background: var(--banner-bg);
@@ -90,15 +98,20 @@
 
         .name-slot {
             flex: 1; display: flex; justify-content: center; align-items: center;
-            font-size: clamp(0.9rem, 1.8vw, 1.6rem); text-transform: uppercase; color: #888;
+            font-size: clamp(1.2rem, 2.2vw, 2.2rem); /* Increased size */
+            font-weight: 700; /* Bolder */
+            text-transform: uppercase; color: #aaa;
             cursor: pointer; overflow: hidden; white-space: nowrap;
+            letter-spacing: 1px;
         }
         .name-spacer { width: var(--middle-width); flex-shrink: 0; }
 
+        /* SCORES AREA */
         .scores-area { display: flex; flex: 1; width: 100%; position: relative; z-index: 10; overflow: hidden; }
 
         .score-pane { flex: 1; display: flex; justify-content: center; align-items: center; overflow: hidden; }
 
+        /* MIDDLE BANNER */
         .middle-banner {
             width: var(--middle-width);
             display: flex; flex-direction: column;
@@ -111,11 +124,17 @@
         }
 
         .break-container { text-align: center; }
-        .break-label { font-size: 0.6rem; color: #666; letter-spacing: 1px; margin-bottom: 2px; }
-        .break-arrow {
-            font-size: 2.2rem; color: var(--accent-green); cursor: pointer;
-            text-shadow: 0 0 10px rgba(34, 255, 109, 0.4);
+        .break-label { font-size: 0.6rem; color: #555; letter-spacing: 1.5px; margin-bottom: 4px; }
+        
+        /* SVG ARROW STYLES (No more OS-specific emojis) */
+        .break-arrow-svg {
+            width: 32px; height: 32px; fill: var(--accent-green);
+            cursor: pointer; filter: drop-shadow(0 0 8px rgba(34, 255, 109, 0.6));
+            transition: transform 0.1s;
         }
+        .break-arrow-svg:active { transform: scale(0.9); }
+        .flipped { transform: scaleX(-1); }
+        .flipped:active { transform: scaleX(-1) scale(0.9); }
 
         .middle-logo { width: 85%; height: auto; opacity: 0.8; margin-bottom: 5px; }
 
@@ -126,6 +145,7 @@
             text-shadow: 0 0 30px rgba(0,0,0,0.6);
         }
 
+        /* FOCUS MODE */
         body.fullscreen-focus .top-nav,
         body.fullscreen-focus .names-banner {
             display: none !important;
@@ -188,7 +208,11 @@
             <section class="middle-banner">
                 <div class="break-container">
                     <div class="break-label">BREAK</div>
-                    <div class="break-arrow" id="break-arrow" onpointerdown="event.stopPropagation()" onclick="toggleBreak()">◀</div>
+                    <div id="arrow-wrap" onpointerdown="event.stopPropagation()" onclick="toggleBreak()">
+                        <svg id="svg-arrow" class="break-arrow-svg" viewBox="0 0 24 24">
+                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/>
+                        </svg>
+                    </div>
                 </div>
                 <img id="logo-img" 
                      src="https://chalkytrousers.github.io/Chalky-Trousers-App-Test/assets/ct-logo-text.png?v=200" 
@@ -214,11 +238,11 @@
                 p2: document.getElementById('p2-txt').innerText,
                 side: breakSide
             };
-            localStorage.setItem('ct_v6_data', JSON.stringify(data));
+            localStorage.setItem('ct_v7_data', JSON.stringify(data));
         }
 
         function loadFromStorage() {
-            const saved = localStorage.getItem('ct_v6_data');
+            const saved = localStorage.getItem('ct_v7_data');
             if (saved) {
                 const data = JSON.parse(saved);
                 document.getElementById('s1').innerText = data.s1 || "0";
@@ -231,15 +255,20 @@
         }
 
         let breakSide = 1; 
-        const arrowEl = document.getElementById('break-arrow');
-
         function toggleBreak() {
             breakSide = breakSide === 1 ? 2 : 1;
             updateArrow();
             saveToStorage();
         }
 
-        function updateArrow() { arrowEl.innerText = breakSide === 1 ? "◀" : "▶"; }
+        function updateArrow() {
+            const arrow = document.getElementById('svg-arrow');
+            if (breakSide === 1) {
+                arrow.classList.remove('flipped');
+            } else {
+                arrow.classList.add('flipped');
+            }
+        }
 
         function changeName(id) {
             const el = document.getElementById(id);
@@ -286,7 +315,6 @@
             const old = el.style.color;
             el.style.color = color;
             setTimeout(() => el.style.color = old, 200);
-            if ("vibrate" in navigator) navigator.vibrate(color === '#ff4444' ? 45 : 20);
         }
 
         function resetMatch() {
