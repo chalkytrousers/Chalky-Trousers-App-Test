@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <link rel="manifest" href="manifest.json?v=31">
+    <link rel="manifest" href="manifest.json?v=32">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -190,7 +190,10 @@
                     <div class="break-label">BREAK</div>
                     <div class="break-arrow" id="break-arrow" onpointerdown="event.stopPropagation()" onclick="toggleBreak()">◀</div>
                 </div>
-                <img id="logo-img" src="./assets/ct-logo-text.png?v=101" class="middle-logo" alt="Logo">
+                <img id="logo-img" 
+                     src="https://chalkytrousers.github.io/Chalky-Trousers-App-Test/assets/ct-logo-text.png?v=200" 
+                     class="middle-logo" 
+                     alt="Logo">
             </section>
 
             <section class="score-pane">
@@ -287,7 +290,7 @@
         }
 
         function resetMatch() {
-            if (confirm("Reset scores?")) {
+            if (confirm("Reset current match scores?")) {
                 document.getElementById('s1').innerText = "0";
                 document.getElementById('s2').innerText = "0";
                 saveToStorage();
