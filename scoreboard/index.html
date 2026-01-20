@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <link rel="manifest" href="manifest.json?v=18">
+    <link rel="manifest" href="manifest.json?v=19">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -23,6 +23,7 @@
             --accent-green: #22ff6d;
             --accent-red: #ff4444;
             --border-color: rgba(255, 255, 255, 0.1);
+            --middle-width: clamp(80px, 12vw, 120px);
         }
 
         * {
@@ -41,7 +42,7 @@
             overflow: hidden;
         }
 
-        /* --- HARDENED ROTATION PROMPT --- */
+        /* --- ORIENTATION PROMPT --- */
         #orientation-overlay {
             display: none; position: fixed; inset: 0; background: #000;
             z-index: 10000; flex-direction: column; justify-content: center;
@@ -59,7 +60,7 @@
             padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
 
-        /* TOP NAVIGATION: High Z-Index to block score bleed */
+        /* TOP NAVIGATION */
         .top-nav {
             display: flex; justify-content: space-between; align-items: center;
             padding: 0 30px; height: 50px;
@@ -74,7 +75,7 @@
             padding: 6px 14px; border-radius: 4px; cursor: pointer; font-family: inherit; font-size: 0.8rem;
         }
 
-        /* SEPARATED NAMES BANNER: High Z-Index */
+        /* NAMES BANNER */
         .names-banner {
             display: flex; height: 60px;
             background: var(--banner-bg);
@@ -85,21 +86,44 @@
         .name-slot {
             flex: 1; display: flex; justify-content: center; align-items: center;
             font-size: clamp(1rem, 2.5vw, 2rem); text-transform: uppercase; color: #888;
-            cursor: pointer; border-right: 1px solid var(--border-color);
+            cursor: pointer;
         }
-        .name-slot:last-child { border-right: none; }
+        /* Added spacer to match middle banner width */
+        .name-spacer { width: var(--middle-width); }
 
-        /* SCORE AREA: Lower Z-Index */
+
+        /* SCORE AREA */
         .scores-area { display: flex; flex: 1; width: 100%; position: relative; z-index: 10; }
 
         .score-pane {
             flex: 1; display: flex; justify-content: center; align-items: center;
-            border-right: 1px solid var(--border-color);
+            /* Border removed here, handled by middle banner */
         }
-        .score-pane:last-child { border-right: none; }
 
+        /* NEW MIDDLE BANNER */
+        .middle-banner {
+            width: var(--middle-width);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: space-between;
+            padding: 20px 5px;
+            background: rgba(0,0,0,0.2);
+            border-left: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            z-index: 100; /* Ensure clickable over scores */
+        }
+
+        .break-container { text-align: center; }
+        .break-label { font-size: 0.8rem; color: #888; letter-spacing: 2px; margin-bottom: 5px; }
+        .break-arrow {
+            font-size: 3rem; color: var(--accent-green); cursor: pointer;
+            text-shadow: 0 0 10px var(--accent-green);
+        }
+
+        .middle-logo { width: 80%; height: auto; opacity: 0.5; }
+
+        /* Slightly adjusted score scaling to fit new layout */
         .score-num {
-            font-size: clamp(10rem, 35vw, 42rem); 
+            font-size: clamp(10rem, 30vw, 35rem); 
             font-weight: 700; line-height: 0.8;
             margin: 0; cursor: pointer;
             text-shadow: 0 0 30px rgba(0,0,0,0.5);
@@ -129,6 +153,7 @@
             <div class="name-slot" onpointerdown="event.stopPropagation()" onclick="changeName('p1-txt')">
                 <span id="p1-txt">PLAYER 1</span>
             </div>
+            <div class="name-spacer"></div>
             <div class="name-slot" onpointerdown="event.stopPropagation()" onclick="changeName('p2-txt')">
                 <span id="p2-txt">PLAYER 2</span>
             </div>
@@ -142,6 +167,14 @@
                      onpointerleave="scCancel('s1')">0</div>
             </section>
 
+            <section class="middle-banner">
+                <div class="break-container">
+                    <div class="break-label">BREAK</div>
+                    <div class="break-arrow" id="break-arrow" onpointerdown="event.stopPropagation()" onclick="toggleBreak()">◀</div>
+                </div>
+                <img src="INSERT_LOGO_PATH_HERE" class="middle-logo" alt="Logo">
+            </section>
+
             <section class="score-pane">
                 <div class="score-num" id="s2" 
                      onpointerdown="scStart(event, 's2')" 
@@ -152,6 +185,20 @@
     </div>
 
     <script>
+        // --- BREAK TOGGLE ---
+        let breakSide = 1; // 1 = Left, 2 = Right
+        const arrowEl = document.getElementById('break-arrow');
+
+        function toggleBreak() {
+            breakSide = breakSide === 1 ? 2 : 1;
+            arrowEl.innerText = breakSide === 1 ? "◀" : "▶";
+            if ("vibrate" in navigator) navigator.vibrate(20);
+        }
+
+        // Initialize Arrow on load
+        toggleBreak(); 
+
+
         // --- NAME EDITING ---
         function changeName(id) {
             const el = document.getElementById(id);
@@ -161,7 +208,7 @@
             }
         }
 
-        // --- SCORE LOGIC ---
+        // --- SCORE LOGIC (Locked V4 Logic) ---
         let holdT;
         let isHold = false;
 
