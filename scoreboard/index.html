@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <link rel="manifest" href="manifest.json?v=33">
+    <link rel="manifest" href="manifest.json?v=35">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -14,7 +14,7 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;700;900&display=swap" rel="stylesheet">
 
     <style>
         :root {
@@ -23,9 +23,9 @@
             --accent-green: #22ff6d;
             --accent-red-subtle: rgba(255, 68, 68, 0.2);
             --border-color: rgba(255, 255, 255, 0.1);
-            --middle-width: clamp(70px, 10vw, 110px);
+            --middle-width: clamp(75px, 11vw, 120px);
             --nav-h: 45px;
-            --name-h: 55px; /* Slightly taller for bigger names */
+            --name-h: 60px;
         }
 
         * {
@@ -45,7 +45,6 @@
             position: fixed; 
         }
 
-        /* ORIENTATION PROMPT */
         #orientation-overlay {
             display: none; position: fixed; inset: 0; background: #000;
             z-index: 10000; flex-direction: column; justify-content: center;
@@ -60,12 +59,9 @@
         .main-wrapper {
             display: flex; flex-direction: column; height: 100dvh; width: 100%;
             background-image: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
-            padding-left: env(safe-area-inset-left);
-            padding-right: env(safe-area-inset-right);
-            padding-bottom: env(safe-area-inset-bottom);
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
 
-        /* TOP NAVIGATION */
         .top-nav {
             display: flex; justify-content: space-between; align-items: center;
             padding: 0 20px; height: var(--nav-h);
@@ -73,12 +69,11 @@
             position: relative; z-index: 100; flex-shrink: 0;
         }
 
-        .logo-text { font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; color: rgba(255,255,255,0.3); }
+        .logo-text { font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; color: rgba(255,255,255,0.4); }
         
         .nav-btn {
             background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #888;
             padding: 4px 12px; border-radius: 4px; cursor: pointer; font-family: inherit; font-size: 0.7rem;
-            transition: all 0.2s;
         }
         .nav-btn.reset { 
             background: var(--accent-red-subtle); 
@@ -88,7 +83,6 @@
 
         #fs-btn { display: none; }
 
-        /* NAMES BANNER */
         .names-banner {
             display: flex; height: var(--name-h);
             background: var(--banner-bg);
@@ -98,25 +92,24 @@
 
         .name-slot {
             flex: 1; display: flex; justify-content: center; align-items: center;
-            font-size: clamp(1.2rem, 2.2vw, 2.2rem); /* Increased size */
-            font-weight: 700; /* Bolder */
-            text-transform: uppercase; color: #aaa;
+            font-size: clamp(1.5rem, 4.5vw, 3.2rem); 
+            font-weight: 900; 
+            text-transform: uppercase; color: #bbb;
             cursor: pointer; overflow: hidden; white-space: nowrap;
             letter-spacing: 1px;
+            padding: 0 10px;
         }
         .name-spacer { width: var(--middle-width); flex-shrink: 0; }
 
-        /* SCORES AREA */
         .scores-area { display: flex; flex: 1; width: 100%; position: relative; z-index: 10; overflow: hidden; }
 
         .score-pane { flex: 1; display: flex; justify-content: center; align-items: center; overflow: hidden; }
 
-        /* MIDDLE BANNER */
         .middle-banner {
             width: var(--middle-width);
             display: flex; flex-direction: column;
             align-items: center; justify-content: space-between;
-            padding: 10px 5px;
+            padding: 15px 5px;
             background: rgba(0,0,0,0.3);
             border-left: 1px solid var(--border-color);
             border-right: 1px solid var(--border-color);
@@ -124,45 +117,46 @@
         }
 
         .break-container { text-align: center; }
-        .break-label { font-size: 0.6rem; color: #555; letter-spacing: 1.5px; margin-bottom: 4px; }
+        .break-label { font-size: 1rem; font-weight: 900; color: #999; letter-spacing: 1.5px; margin-bottom: 8px; }
         
-        /* SVG ARROW STYLES (No more OS-specific emojis) */
         .break-arrow-svg {
-            width: 32px; height: 32px; fill: var(--accent-green);
-            cursor: pointer; filter: drop-shadow(0 0 8px rgba(34, 255, 109, 0.6));
+            width: 38px; height: 38px; fill: var(--accent-green);
+            cursor: pointer; filter: drop-shadow(0 0 10px rgba(34, 255, 109, 0.6));
             transition: transform 0.1s;
         }
-        .break-arrow-svg:active { transform: scale(0.9); }
         .flipped { transform: scaleX(-1); }
-        .flipped:active { transform: scaleX(-1) scale(0.9); }
+
+        /* TAPPABLE RULESET AREA */
+        .rules-cycle-area {
+            text-align: center; cursor: pointer;
+            padding: 8px 0; width: 100%;
+            transition: opacity 0.1s;
+        }
+        .rules-cycle-area:active { opacity: 0.6; }
+        .rules-val {
+            display: block; font-size: 0.85rem; font-weight: 900;
+            color: var(--accent-green); text-transform: uppercase;
+            letter-spacing: 1px;
+        }
 
         .middle-logo { width: 85%; height: auto; opacity: 0.8; margin-bottom: 5px; }
 
         .score-num {
-            font-size: clamp(8rem, 30vw, 35rem); 
+            font-size: clamp(8rem, 32vw, 38rem); 
             font-weight: 700; line-height: 1;
             margin: 0; cursor: pointer;
             text-shadow: 0 0 30px rgba(0,0,0,0.6);
         }
 
-        /* FOCUS MODE */
         body.fullscreen-focus .top-nav,
         body.fullscreen-focus .names-banner {
             display: none !important;
         }
         
         #exit-focus {
-            display: none;
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            z-index: 1000;
-            background: rgba(0,0,0,0.7);
-            border: 1px solid var(--border-color);
-            color: #fff;
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 0.7rem;
+            display: none; position: fixed; top: 10px; right: 10px; z-index: 1000;
+            background: rgba(0,0,0,0.7); border: 1px solid var(--border-color);
+            color: #fff; padding: 6px 10px; border-radius: 6px; font-size: 0.7rem;
             backdrop-filter: blur(4px);
         }
         body.fullscreen-focus #exit-focus { display: block; }
@@ -173,14 +167,14 @@
     <div id="orientation-overlay">
         <div style="font-size: 4rem; margin-bottom: 20px;">📱🔄</div>
         <h2>ROTATE TO LANDSCAPE</h2>
-        <p style="color: #666;">Chalky Trousers Scoreboard requires horizontal view.</p>
+        <p style="color: #666;">Scoreboard requires horizontal view.</p>
     </div>
 
     <button id="exit-focus" onpointerdown="event.stopPropagation()" onclick="toggleFS()">✕ Show Controls</button>
 
     <div class="main-wrapper">
         <header class="top-nav">
-            <div class="logo-text">CHALKY TROUSERS</div>
+            <div class="logo-text">WWW.CHALKYTROUSERS.CO.UK</div>
             <div style="display:flex; gap:10px;">
                 <button class="nav-btn" id="fs-btn" onpointerdown="event.stopPropagation()" onclick="toggleFS()">⛶ Fullscreen</button>
                 <button class="nav-btn reset" onpointerdown="event.stopPropagation()" onclick="resetMatch()">Reset</button>
@@ -214,8 +208,13 @@
                         </svg>
                     </div>
                 </div>
+
+                <div class="rules-cycle-area" onpointerdown="event.stopPropagation()" onclick="cycleRules()">
+                    <span class="rules-val" id="rules-display">uk8</span>
+                </div>
+
                 <img id="logo-img" 
-                     src="https://chalkytrousers.github.io/Chalky-Trousers-App-Test/assets/ct-logo-text.png?v=200" 
+                     src="https://chalkytrousers.github.io/Chalky-Trousers-App-Test/assets/ct-logo-text.png?v=205" 
                      class="middle-logo" 
                      alt="Logo">
             </section>
@@ -230,19 +229,25 @@
     </div>
 
     <script>
+        const STORAGE_KEY = 'ct_v8_data';
+        const RULESETS = ['uk8', 'wpa', 'ultimate', 'custom'];
+        let currentRulesIdx = 0;
+        let breakSide = 1;
+
         function saveToStorage() {
             const data = {
                 s1: document.getElementById('s1').innerText,
                 s2: document.getElementById('s2').innerText,
                 p1: document.getElementById('p1-txt').innerText,
                 p2: document.getElementById('p2-txt').innerText,
-                side: breakSide
+                side: breakSide,
+                rulesIdx: currentRulesIdx
             };
-            localStorage.setItem('ct_v7_data', JSON.stringify(data));
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
         }
 
         function loadFromStorage() {
-            const saved = localStorage.getItem('ct_v7_data');
+            const saved = localStorage.getItem(STORAGE_KEY);
             if (saved) {
                 const data = JSON.parse(saved);
                 document.getElementById('s1').innerText = data.s1 || "0";
@@ -250,11 +255,12 @@
                 document.getElementById('p1-txt').innerText = data.p1 || "PLAYER 1";
                 document.getElementById('p2-txt').innerText = data.p2 || "PLAYER 2";
                 breakSide = data.side || 1;
+                currentRulesIdx = data.rulesIdx || 0;
                 updateArrow();
+                updateRulesDisplay();
             }
         }
 
-        let breakSide = 1; 
         function toggleBreak() {
             breakSide = breakSide === 1 ? 2 : 1;
             updateArrow();
@@ -263,11 +269,18 @@
 
         function updateArrow() {
             const arrow = document.getElementById('svg-arrow');
-            if (breakSide === 1) {
-                arrow.classList.remove('flipped');
-            } else {
-                arrow.classList.add('flipped');
-            }
+            breakSide === 1 ? arrow.classList.remove('flipped') : arrow.classList.add('flipped');
+        }
+
+        function cycleRules() {
+            currentRulesIdx = (currentRulesIdx + 1) % RULESETS.length;
+            updateRulesDisplay();
+            saveToStorage();
+            if ("vibrate" in navigator) navigator.vibrate(20);
+        }
+
+        function updateRulesDisplay() {
+            document.getElementById('rules-display').innerText = RULESETS[currentRulesIdx];
         }
 
         function changeName(id) {
@@ -281,7 +294,6 @@
 
         let holdT;
         let isHold = false;
-
         function scStart(e, id) {
             e.preventDefault(); 
             document.activeElement.blur(); 
@@ -292,7 +304,6 @@
                 flash(id, '#ff4444');
             }, 600);
         }
-
         function scEnd(e, id) {
             clearTimeout(holdT);
             if (!isHold) {
@@ -300,23 +311,19 @@
                 flash(id, '#22ff6d');
             }
         }
-
         function scCancel(id) { clearTimeout(holdT); }
-
         function update(id, n) {
             const el = document.getElementById(id);
             let val = parseInt(el.innerText) + n;
             el.innerText = val < 0 ? 0 : val;
             saveToStorage();
         }
-
         function flash(id, color) {
             const el = document.getElementById(id);
             const old = el.style.color;
             el.style.color = color;
             setTimeout(() => el.style.color = old, 200);
         }
-
         function resetMatch() {
             if (confirm("Reset current match scores?")) {
                 document.getElementById('s1').innerText = "0";
@@ -324,40 +331,23 @@
                 saveToStorage();
             }
         }
-
         function toggleFS() {
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-            if (isIOS) {
-                document.body.classList.toggle('fullscreen-focus');
-            } else {
-                if (!document.fullscreenElement) {
-                    document.documentElement.requestFullscreen().catch(e => console.log(e));
-                } else {
-                    document.exitFullscreen();
-                }
-            }
+            isIOS ? document.body.classList.toggle('fullscreen-focus') : 
+            (!document.fullscreenElement ? document.documentElement.requestFullscreen().catch(e => console.log(e)) : document.exitFullscreen());
         }
-
         function checkOrient() {
-            document.getElementById('orientation-overlay').style.display = 
-                (window.innerHeight > window.innerWidth) ? 'flex' : 'none';
+            document.getElementById('orientation-overlay').style.display = (window.innerHeight > window.innerWidth) ? 'flex' : 'none';
         }
-
         window.addEventListener('resize', checkOrient);
         window.addEventListener('load', () => {
             checkOrient();
             loadFromStorage();
             const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-            if (!isStandalone || !isIOS) {
-                document.getElementById('fs-btn').style.display = 'block';
-            }
+            if (!isStandalone || !isIOS) document.getElementById('fs-btn').style.display = 'block';
         });
-
-        document.addEventListener('touchstart', (e) => {
-            if (e.touches.length > 1) e.preventDefault();
-        }, { passive: false });
-
+        document.addEventListener('touchstart', (e) => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
         window.oncontextmenu = (e) => { if(e.target.classList.contains('score-num')) e.preventDefault(); };
     </script>
 </body>
