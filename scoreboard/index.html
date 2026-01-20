@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <link rel="manifest" href="manifest.json?v=29">
+    <link rel="manifest" href="manifest.json?v=31">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -79,7 +79,6 @@
         }
         .nav-btn.reset { background: var(--accent-red); border: none; }
 
-        /* Hidden by default, script will show it if needed */
         #fs-btn { display: none; }
 
         .names-banner {
@@ -127,7 +126,6 @@
             text-shadow: 0 0 30px rgba(0,0,0,0.6);
         }
 
-        /* FOCUS MODE */
         body.fullscreen-focus .top-nav,
         body.fullscreen-focus .names-banner {
             display: none !important;
@@ -192,7 +190,7 @@
                     <div class="break-label">BREAK</div>
                     <div class="break-arrow" id="break-arrow" onpointerdown="event.stopPropagation()" onclick="toggleBreak()">◀</div>
                 </div>
-                <img id="logo-img" src="assets/ct-logo-text.png?v=1" class="middle-logo" alt="Logo" onerror="this.onerror=null; this.src='assets/ct-logo-text.jpg';">
+                <img id="logo-img" src="./assets/ct-logo-text.png?v=101" class="middle-logo" alt="Logo">
             </section>
 
             <section class="score-pane">
@@ -205,7 +203,6 @@
     </div>
 
     <script>
-        // --- DATA PERSISTENCE ---
         function saveToStorage() {
             const data = {
                 s1: document.getElementById('s1').innerText,
@@ -230,7 +227,6 @@
             }
         }
 
-        // --- MATCH CONTROLS ---
         let breakSide = 1; 
         const arrowEl = document.getElementById('break-arrow');
 
@@ -240,9 +236,7 @@
             saveToStorage();
         }
 
-        function updateArrow() {
-            arrowEl.innerText = breakSide === 1 ? "◀" : "▶";
-        }
+        function updateArrow() { arrowEl.innerText = breakSide === 1 ? "◀" : "▶"; }
 
         function changeName(id) {
             const el = document.getElementById(id);
@@ -253,7 +247,6 @@
             }
         }
 
-        // --- SCORING LOGIC (LOCKED V.4) ---
         let holdT;
         let isHold = false;
 
@@ -294,22 +287,18 @@
         }
 
         function resetMatch() {
-            if (confirm("Reset current match scores?")) {
+            if (confirm("Reset scores?")) {
                 document.getElementById('s1').innerText = "0";
                 document.getElementById('s2').innerText = "0";
                 saveToStorage();
             }
         }
 
-        // --- DYNAMIC FULLSCREEN LOGIC ---
         function toggleFS() {
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-
             if (isIOS) {
-                // iPhone: Toggle Focus Mode (Hides headers)
                 document.body.classList.toggle('fullscreen-focus');
             } else {
-                // Android: True System Fullscreen
                 if (!document.fullscreenElement) {
                     document.documentElement.requestFullscreen().catch(e => console.log(e));
                 } else {
@@ -327,17 +316,13 @@
         window.addEventListener('load', () => {
             checkOrient();
             loadFromStorage();
-            
-            // LOGIC: Show Fullscreen button ONLY if Android OR iPhone-NOT-in-standalone
             const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-            
             if (!isStandalone || !isIOS) {
                 document.getElementById('fs-btn').style.display = 'block';
             }
         });
 
-        // Prevent double-tap zoom
         document.addEventListener('touchstart', (e) => {
             if (e.touches.length > 1) e.preventDefault();
         }, { passive: false });
