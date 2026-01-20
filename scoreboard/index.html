@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <link rel="manifest" href="manifest.json?v=26">
+    <link rel="manifest" href="manifest.json?v=28">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#0f0f0f">
+    <meta name="theme-color" content="#000000">
 
     <title>Chalky Trousers Scoreboard</title>
     
@@ -18,8 +18,8 @@
 
     <style>
         :root {
-            --bg-dark: #0f0f0f;
-            --banner-bg: #151515;
+            --bg-dark: #000000;
+            --banner-bg: #111111;
             --accent-green: #22ff6d;
             --accent-red: #ff4444;
             --border-color: rgba(255, 255, 255, 0.1);
@@ -33,7 +33,7 @@
             user-select: none !important;
             -webkit-user-select: none !important;
             -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
+            touch-action: none; 
         }
 
         body, html {
@@ -58,8 +58,7 @@
 
         .main-wrapper {
             display: flex; flex-direction: column; height: 100dvh; width: 100%;
-            background-image: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%);
-            /* Safe area padding to prevent clipping on iPhone notch */
+            background-image: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
             padding-left: env(safe-area-inset-left);
             padding-right: env(safe-area-inset-right);
             padding-bottom: env(safe-area-inset-bottom);
@@ -75,7 +74,7 @@
         .logo-text { font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; color: rgba(255,255,255,0.4); }
         
         .nav-btn {
-            background: #222; border: 1px solid #444; color: white;
+            background: var(--accent-red); border: none; color: white;
             padding: 5px 12px; border-radius: 4px; cursor: pointer; font-family: inherit; font-size: 0.75rem;
         }
 
@@ -123,29 +122,6 @@
             margin: 0; cursor: pointer;
             text-shadow: 0 0 30px rgba(0,0,0,0.6);
         }
-
-        /* FULLSCREEN/FOCUS MODE HIDES HEADERS */
-        body.fullscreen-focus .top-nav,
-        body.fullscreen-focus .names-banner {
-            display: none !important;
-        }
-        
-        #exit-focus {
-            display: none;
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            z-index: 1000;
-            background: rgba(0,0,0,0.7);
-            border: 1px solid var(--border-color);
-            color: #fff;
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 0.7rem;
-            backdrop-filter: blur(4px);
-        }
-        body.fullscreen-focus #exit-focus { display: block; }
-
     </style>
 </head>
 <body>
@@ -156,15 +132,10 @@
         <p style="color: #666;">Chalky Trousers Scoreboard requires horizontal view.</p>
     </div>
 
-    <button id="exit-focus" onpointerdown="event.stopPropagation()" onclick="toggleFS()">✕ Show Controls</button>
-
     <div class="main-wrapper">
         <header class="top-nav">
             <div class="logo-text">CHALKY TROUSERS</div>
-            <div style="display:flex; gap:10px;">
-                <button class="nav-btn" onpointerdown="event.stopPropagation()" onclick="toggleFS()">⛶ Fullscreen</button>
-                <button class="nav-btn" onpointerdown="event.stopPropagation()" style="background:var(--accent-red); border:none;" onclick="resetMatch()">Reset</button>
-            </div>
+            <button class="nav-btn" onpointerdown="event.stopPropagation()" onclick="resetMatch()">Reset</button>
         </header>
 
         <nav class="names-banner">
@@ -190,7 +161,7 @@
                     <div class="break-label">BREAK</div>
                     <div class="break-arrow" id="break-arrow" onpointerdown="event.stopPropagation()" onclick="toggleBreak()">◀</div>
                 </div>
-                <img src="assets/ct-logo-text.png" class="middle-logo" alt="Logo">
+                <img id="logo-img" src="assets/ct-logo-text.png" class="middle-logo" alt="Logo" onerror="this.onerror=null; this.src='assets/ct-logo-text.jpg';">
             </section>
 
             <section class="score-pane">
@@ -289,32 +260,10 @@
         }
 
         function resetMatch() {
-            if (confirm("Reset current match scores?")) {
+            if (confirm("Reset match?")) {
                 document.getElementById('s1').innerText = "0";
                 document.getElementById('s2').innerText = "0";
                 saveToStorage();
-            }
-        }
-
-        function toggleFS() {
-            const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
-
-            // In Standalone Mode, just toggle the headers for extra space
-            if (isStandalone) {
-                document.body.classList.toggle('fullscreen-focus');
-                return;
-            }
-
-            // In Browser Mode, attempt system fullscreen or fallback to pseudo-fullscreen
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-            if (isIOS) {
-                document.body.classList.toggle('fullscreen-focus');
-            } else {
-                if (!document.fullscreenElement) {
-                    document.documentElement.requestFullscreen().catch(e => console.log(e));
-                } else {
-                    document.exitFullscreen();
-                }
             }
         }
 
@@ -328,6 +277,10 @@
             checkOrient();
             loadFromStorage();
         });
+
+        document.addEventListener('touchstart', (e) => {
+            if (e.touches.length > 1) e.preventDefault();
+        }, { passive: false });
 
         window.oncontextmenu = (e) => { if(e.target.classList.contains('score-num')) e.preventDefault(); };
     </script>
