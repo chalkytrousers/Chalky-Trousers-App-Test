@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <link rel="manifest" href="manifest.json?v=20">
+    <link rel="manifest" href="manifest.json?v=22">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -42,7 +42,6 @@
             overflow: hidden;
         }
 
-        /* HARDENED ROTATION PROMPT */
         #orientation-overlay {
             display: none; position: fixed; inset: 0; background: #000;
             z-index: 10000; flex-direction: column; justify-content: center;
@@ -60,7 +59,6 @@
             padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
 
-        /* TOP NAVIGATION */
         .top-nav {
             display: flex; justify-content: space-between; align-items: center;
             padding: 0 30px; height: 50px;
@@ -75,7 +73,6 @@
             padding: 6px 14px; border-radius: 4px; cursor: pointer; font-family: inherit; font-size: 0.8rem;
         }
 
-        /* NAMES BANNER */
         .names-banner {
             display: flex; height: 60px;
             background: var(--banner-bg);
@@ -90,12 +87,10 @@
         }
         .name-spacer { width: var(--middle-width); }
 
-        /* SCORE AREA */
         .scores-area { display: flex; flex: 1; width: 100%; position: relative; z-index: 10; }
 
         .score-pane { flex: 1; display: flex; justify-content: center; align-items: center; }
 
-        /* MIDDLE BANNER SPLIT */
         .middle-banner {
             width: var(--middle-width);
             display: flex; flex-direction: column;
@@ -116,7 +111,7 @@
         }
         .break-arrow:active { transform: scale(0.9); }
 
-        .middle-logo { width: 90%; height: auto; opacity: 0.7; margin-bottom: 10px; }
+        .middle-logo { width: 90%; height: auto; opacity: 0.8; margin-bottom: 10px; }
 
         .score-num {
             font-size: clamp(10rem, 30vw, 38rem); 
@@ -132,7 +127,7 @@
     <div id="orientation-overlay">
         <div style="font-size: 4rem; margin-bottom: 20px;">📱🔄</div>
         <h2>ROTATE TO LANDSCAPE</h2>
-        <p style="color: #666;">Chalky Trousers Scoreboard requires horizontal view.</p>
+        <p style="color: #666;">This app is designed for horizontal view only.</p>
     </div>
 
     <div class="main-wrapper">
@@ -167,8 +162,7 @@
                     <div class="break-label">BREAK</div>
                     <div class="break-arrow" id="break-arrow" onpointerdown="event.stopPropagation()" onclick="toggleBreak()">◀</div>
                 </div>
-                
-                <img src="assets/Chalky Trousers Logo (Text) 800x500 HR_20260120_122527_0000.png" class="middle-logo" alt="Chalky Logo">
+                <img src="assets/ct-logo-text.png" class="middle-logo" alt="Chalky Logo">
             </section>
 
             <section class="score-pane">
@@ -181,7 +175,6 @@
     </div>
 
     <script>
-        // --- STORAGE LOGIC ---
         function saveToStorage() {
             const data = {
                 s1: document.getElementById('s1').innerText,
@@ -206,7 +199,6 @@
             }
         }
 
-        // --- BREAK TOGGLE ---
         let breakSide = 1; 
         const arrowEl = document.getElementById('break-arrow');
 
@@ -214,14 +206,12 @@
             breakSide = breakSide === 1 ? 2 : 1;
             updateArrow();
             saveToStorage();
-            if ("vibrate" in navigator) navigator.vibrate(25);
         }
 
         function updateArrow() {
             arrowEl.innerText = breakSide === 1 ? "◀" : "▶";
         }
 
-        // --- NAME EDITING ---
         function changeName(id) {
             const el = document.getElementById(id);
             const res = prompt("Enter Name:", el.innerText);
@@ -231,12 +221,12 @@
             }
         }
 
-        // --- SCORE LOGIC ---
         let holdT;
         let isHold = false;
 
         function scStart(e, id) {
             e.preventDefault(); 
+            document.activeElement.blur(); 
             isHold = false;
             holdT = setTimeout(() => {
                 isHold = true;
@@ -270,9 +260,8 @@
             if ("vibrate" in navigator) navigator.vibrate(color === '#ff4444' ? 45 : 20);
         }
 
-        // --- UTILS ---
         function resetMatch() {
-            if (confirm("Clear current match scores?")) {
+            if (confirm("Reset match scores?")) {
                 document.getElementById('s1').innerText = "0";
                 document.getElementById('s2').innerText = "0";
                 saveToStorage();
