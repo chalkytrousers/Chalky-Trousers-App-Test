@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <link rel="manifest" href="manifest.json?v=3">
+    <link rel="manifest" href="manifest.json?v=17">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0f0f0f">
 
-    <title>Scoreboard Pro</title>
+    <title>Chalky Trousers Scoreboard</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -19,248 +19,214 @@
     <style>
         :root {
             --bg-dark: #0f0f0f;
-            --panel-bg: rgba(255, 255, 255, 0.03);
-            --accent-green: #4CAF50;
+            --banner-bg: #111;
+            --accent-green: #22ff6d;
             --accent-red: #ff4444;
-            --border-color: rgba(255, 255, 255, 0.1);
+            --border-color: rgba(255, 255, 255, 0.08);
         }
 
         * {
             box-sizing: border-box;
-            user-select: none;
+            user-select: none !important;
+            -webkit-user-select: none !important;
             -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
 
         body, html {
-            margin: 0;
-            padding: 0;
-            height: 100dvh;
-            width: 100vw;
+            margin: 0; padding: 0;
+            height: 100dvh; width: 100vw;
             background: var(--bg-dark);
-            background-image: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%);
-            color: white;
-            font-family: 'Chakra Petch', sans-serif;
+            color: white; font-family: 'Chakra Petch', sans-serif;
             overflow: hidden;
         }
 
-        /* ENFORCE HORIZONTAL ORIENTATION */
-        @media (orientation: portrait) {
-            #orientation-overlay { display: flex; }
-            .main-wrapper { display: none; }
-        }
-
+        /* --- ORIENTATION PROMPT --- */
         #orientation-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: #000;
-            z-index: 9999;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
+            display: none; position: fixed; inset: 0; background: #000;
+            z-index: 10000; flex-direction: column; justify-content: center;
+            align-items: center; text-align: center;
         }
 
-        /* MAIN APP WRAPPER */
+        @media screen and (orientation: portrait) {
+            #orientation-overlay { display: flex !important; }
+            .main-wrapper { display: none !important; }
+        }
+
         .main-wrapper {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            width: 100%;
+            display: flex; flex-direction: column; height: 100%; width: 100%;
+            background-image: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%);
             padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
 
-        /* NAVIGATION BAR */
+        /* TOP NAVIGATION */
         .top-nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 30px; height: 50px;
+            background: rgba(0, 0, 0, 0.3); border-bottom: 1px solid var(--border-color);
+        }
+
+        .logo-text { font-size: 1rem; font-weight: 700; letter-spacing: 2px; color: rgba(255,255,255,0.5); }
+        .nav-btn {
+            background: #222; border: 1px solid #444; color: white;
+            padding: 6px 14px; border-radius: 4px; cursor: pointer; font-family: inherit; font-size: 0.8rem;
+        }
+
+        /* NAMES BANNER: Completely separate from the scores */
+        .names-banner {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 30px;
-            height: 60px;
-            background: rgba(0, 0, 0, 0.2);
+            height: 70px;
+            background: var(--banner-bg);
             border-bottom: 1px solid var(--border-color);
         }
 
-        .logo-text {
-            font-size: 1.2rem;
-            font-weight: 700;
-            letter-spacing: 2px;
-            color: rgba(255,255,255,0.7);
-        }
-
-        .nav-controls { display: flex; gap: 10px; }
-
-        .nav-btn {
-            background: #222;
-            border: 1px solid #444;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-family: inherit;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-        }
-
-        .nav-btn:active { background: #333; }
-        .nav-btn.reset-btn { background: var(--accent-red); border-color: transparent; }
-
-        /* SCOREBOARD LAYOUT */
-        .scoreboard-area {
-            display: flex;
-            flex: 1;
-            width: 100%;
-        }
-
-        .player-pane {
+        .name-slot {
             flex: 1;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            position: relative;
+            font-size: clamp(1.2rem, 3vw, 2.5rem);
+            text-transform: uppercase;
+            color: #888;
+            cursor: pointer;
             border-right: 1px solid var(--border-color);
         }
+        .name-slot:last-child { border-right: none; }
+        .name-slot:active { background: rgba(255,255,255,0.05); }
 
-        .player-pane:last-child { border-right: none; }
+        /* SCORES AREA */
+        .scores-area { display: flex; flex: 1; width: 100%; }
 
-        /* BREAK INDICATOR */
-        .break-tag {
-            font-size: 0.8rem;
-            letter-spacing: 3px;
-            color: var(--accent-green);
-            margin-bottom: 10px;
-            opacity: 0;
-            transition: opacity 0.3s;
+        .score-pane {
+            flex: 1; display: flex; justify-content: center; align-items: center;
+            border-right: 1px solid var(--border-color);
+            position: relative;
         }
-        .break-tag.active { opacity: 1; }
-
-        /* TEXT SCALING */
-        .player-name {
-            font-size: clamp(1rem, 3vw, 2.5rem);
-            text-transform: uppercase;
-            color: #777;
-        }
+        .score-pane:last-child { border-right: none; }
 
         .score-num {
-            font-size: clamp(8rem, 30vw, 38rem);
-            font-weight: 700;
-            line-height: 0.8;
-            margin: 10px 0;
-            text-shadow: 0 0 30px rgba(255,255,255,0.1);
+            font-size: clamp(12rem, 38vw, 48rem); 
+            font-weight: 700; line-height: 0.8;
+            margin: 0; cursor: pointer;
+            text-shadow: 0 0 40px rgba(0,0,0,0.5);
         }
-
-        /* SCORE CONTROLS */
-        .score-btns { display: flex; gap: 20px; }
-
-        .control-btn {
-            background: #1a1a1a;
-            border: none;
-            color: white;
-            width: clamp(60px, 10vw, 130px);
-            height: clamp(45px, 8vh, 85px);
-            border-radius: 8px;
-            font-size: 1.8rem;
-            cursor: pointer;
-            border-bottom: 5px solid #000;
-            transition: transform 0.05s;
-        }
-
-        .control-btn:active {
-            transform: translateY(3px);
-            border-bottom-width: 2px;
-        }
-
-        .btn-plus { border-bottom-color: var(--accent-green) !important; }
-        .btn-minus { border-bottom-color: var(--accent-red) !important; }
 
     </style>
 </head>
 <body>
 
     <div id="orientation-overlay">
-        <div style="font-size: 4rem;">📱🔄</div>
-        <h2 style="margin: 20px 0 10px;">ROTATE DEVICE</h2>
-        <p style="color: #666;">This scoreboard requires horizontal mode.</p>
+        <div style="font-size: 4rem; margin-bottom: 20px;">📱🔄</div>
+        <h2>PLEASE ROTATE</h2>
+        <p style="color: #666;">Landscape mode is required for the scoreboard.</p>
     </div>
 
     <div class="main-wrapper">
         <header class="top-nav">
-            <div class="logo-text">SCOREBOARD</div>
-            <div class="nav-controls">
-                <button class="nav-btn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
-                <button class="nav-btn" onclick="swapPlayers()">Swap</button>
-                <button class="nav-btn reset-btn" onclick="resetGame()">Reset</button>
+            <div class="logo-text">CHALKY TROUSERS</div>
+            <div style="display:flex; gap:10px;">
+                <button class="nav-btn" onclick="toggleFS()">⛶ Fullscreen</button>
+                <button class="nav-btn" style="background:var(--accent-red); border:none;" onclick="resetMatch()">Reset</button>
             </div>
         </header>
 
-        <main class="scoreboard-area">
-            <section class="player-pane" onclick="toggleBreak(1)">
-                <div class="break-tag active" id="break1">● BREAK</div>
-                <div class="player-name">Player 1</div>
-                <div class="score-num" id="s1">0</div>
-                <div class="score-btns">
-                    <button class="control-btn btn-plus" onclick="updateScore('s1', 1); event.stopPropagation();">+</button>
-                    <button class="control-btn btn-minus" onclick="updateScore('s1', -1); event.stopPropagation();">-</button>
-                </div>
+        <nav class="names-banner">
+            <div class="name-slot" onclick="changeName('p1-name')">
+                <span id="p1-name">PLAYER 1</span>
+            </div>
+            <div class="name-slot" onclick="changeName('p2-name')">
+                <span id="p2-name">PLAYER 2</span>
+            </div>
+        </nav>
+
+        <main class="scores-area">
+            <section class="score-pane">
+                <div class="score-num" id="s1" 
+                     onpointerdown="scStart(event, 's1')" 
+                     onpointerup="scEnd(event, 's1')"
+                     onpointerleave="scCancel('s1')">0</div>
             </section>
 
-            <section class="player-pane" onclick="toggleBreak(2)">
-                <div class="break-tag" id="break2">● BREAK</div>
-                <div class="player-name">Player 2</div>
-                <div class="score-num" id="s2">0</div>
-                <div class="score-btns">
-                    <button class="control-btn btn-plus" onclick="updateScore('s2', 1); event.stopPropagation();">+</button>
-                    <button class="control-btn btn-minus" onclick="updateScore('s2', -1); event.stopPropagation();">-</button>
-                </div>
+            <section class="score-pane">
+                <div class="score-num" id="s2" 
+                     onpointerdown="scStart(event, 's2')" 
+                     onpointerup="scEnd(event, 's2')"
+                     onpointerleave="scoreCancel('s2')">0</div>
             </section>
         </main>
     </div>
 
     <script>
-        // CORE FUNCTIONS
-        function updateScore(id, amt) {
+        // --- NAME EDITING ---
+        // Using a system prompt is the ONLY way to guarantee 100% isolation 
+        // from the scoring screen on Android/TV browsers.
+        function changeName(id) {
             const el = document.getElementById(id);
-            let val = parseInt(el.innerText) + amt;
-            if (val < 0) val = 0;
-            el.innerText = val;
+            const newName = prompt("Enter Player Name:", el.innerText);
+            if (newName !== null && newName.trim() !== "") {
+                el.innerText = newName.toUpperCase();
+            }
         }
 
-        function resetGame() {
-            if (confirm("Reset scores to zero?")) {
+        // --- SCORE INTERACTION ---
+        let hTimer;
+        let isH = false;
+
+        function scStart(e, id) {
+            e.preventDefault(); 
+            isH = false;
+            hTimer = setTimeout(() => {
+                isH = true;
+                update(id, -1);
+                flash(id, '#ff4444');
+            }, 600);
+        }
+
+        function scEnd(e, id) {
+            clearTimeout(hTimer);
+            if (!isH) {
+                update(id, 1);
+                flash(id, '#22ff6d');
+            }
+        }
+
+        function scCancel(id) { clearTimeout(hTimer); }
+
+        function update(id, n) {
+            const el = document.getElementById(id);
+            let v = parseInt(el.innerText) + n;
+            el.innerText = v < 0 ? 0 : v;
+        }
+
+        function flash(id, color) {
+            const el = document.getElementById(id);
+            const old = el.style.color;
+            el.style.color = color;
+            setTimeout(() => el.style.color = old, 200);
+            if ("vibrate" in navigator) navigator.vibrate(color === '#ff4444' ? 40 : 15);
+        }
+
+        // --- UTILS ---
+        function resetMatch() {
+            if (confirm("Reset scores?")) {
                 document.getElementById('s1').innerText = "0";
                 document.getElementById('s2').innerText = "0";
             }
         }
 
-        function swapPlayers() {
-            const s1 = document.getElementById('s1'), s2 = document.getElementById('s2');
-            [s1.innerText, s2.innerText] = [s2.innerText, s1.innerText];
-            
-            // Swap break indicator as well
-            const b1 = document.getElementById('break1'), b2 = document.getElementById('break2');
-            const b1Active = b1.classList.contains('active');
-            b1.classList.toggle('active', !b1Active);
-            b2.classList.toggle('active', b1Active);
+        function toggleFS() {
+            if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+            else document.exitFullscreen();
         }
 
-        function toggleBreak(player) {
-            document.getElementById('break1').classList.toggle('active', player === 1);
-            document.getElementById('break2').classList.toggle('active', player === 2);
+        function checkOrient() {
+            document.getElementById('orientation-overlay').style.display = 
+                (window.innerHeight > window.innerWidth) ? 'flex' : 'none';
         }
+        window.addEventListener('resize', checkOrient);
+        window.addEventListener('load', checkOrient);
 
-        function toggleFullscreen() {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(e => console.log(e));
-            } else {
-                document.exitFullscreen();
-            }
-        }
-
-        // Prevent zoom on double tap for iOS
-        document.addEventListener('touchstart', (e) => {
-            if (e.touches.length > 1) e.preventDefault();
-        }, { passive: false });
+        window.oncontextmenu = (e) => { if(e.target.classList.contains('score-num')) e.preventDefault(); };
     </script>
 </body>
 </html>
