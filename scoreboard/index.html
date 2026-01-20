@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <link rel="manifest" href="manifest.json?v=17">
+    <link rel="manifest" href="manifest.json?v=18">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -19,10 +19,10 @@
     <style>
         :root {
             --bg-dark: #0f0f0f;
-            --banner-bg: #111;
+            --banner-bg: #151515;
             --accent-green: #22ff6d;
             --accent-red: #ff4444;
-            --border-color: rgba(255, 255, 255, 0.08);
+            --border-color: rgba(255, 255, 255, 0.1);
         }
 
         * {
@@ -41,7 +41,7 @@
             overflow: hidden;
         }
 
-        /* --- ORIENTATION PROMPT --- */
+        /* --- HARDENED ROTATION PROMPT --- */
         #orientation-overlay {
             display: none; position: fixed; inset: 0; background: #000;
             z-index: 10000; flex-direction: column; justify-content: center;
@@ -59,56 +59,51 @@
             padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
 
-        /* TOP NAVIGATION */
+        /* TOP NAVIGATION: High Z-Index to block score bleed */
         .top-nav {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 10px 30px; height: 50px;
-            background: rgba(0, 0, 0, 0.3); border-bottom: 1px solid var(--border-color);
+            padding: 0 30px; height: 50px;
+            background: rgba(0, 0, 0, 0.4); border-bottom: 1px solid var(--border-color);
+            position: relative; z-index: 100; 
         }
 
-        .logo-text { font-size: 1rem; font-weight: 700; letter-spacing: 2px; color: rgba(255,255,255,0.5); }
+        .logo-text { font-size: 0.9rem; font-weight: 700; letter-spacing: 2px; color: rgba(255,255,255,0.4); }
+        
         .nav-btn {
             background: #222; border: 1px solid #444; color: white;
             padding: 6px 14px; border-radius: 4px; cursor: pointer; font-family: inherit; font-size: 0.8rem;
         }
 
-        /* NAMES BANNER: Completely separate from the scores */
+        /* SEPARATED NAMES BANNER: High Z-Index */
         .names-banner {
-            display: flex;
-            height: 70px;
+            display: flex; height: 60px;
             background: var(--banner-bg);
             border-bottom: 1px solid var(--border-color);
+            position: relative; z-index: 100;
         }
 
         .name-slot {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: clamp(1.2rem, 3vw, 2.5rem);
-            text-transform: uppercase;
-            color: #888;
-            cursor: pointer;
-            border-right: 1px solid var(--border-color);
+            flex: 1; display: flex; justify-content: center; align-items: center;
+            font-size: clamp(1rem, 2.5vw, 2rem); text-transform: uppercase; color: #888;
+            cursor: pointer; border-right: 1px solid var(--border-color);
         }
         .name-slot:last-child { border-right: none; }
-        .name-slot:active { background: rgba(255,255,255,0.05); }
 
-        /* SCORES AREA */
-        .scores-area { display: flex; flex: 1; width: 100%; }
+        /* SCORE AREA: Lower Z-Index */
+        .scores-area { display: flex; flex: 1; width: 100%; position: relative; z-index: 10; }
 
         .score-pane {
             flex: 1; display: flex; justify-content: center; align-items: center;
             border-right: 1px solid var(--border-color);
-            position: relative;
         }
         .score-pane:last-child { border-right: none; }
 
         .score-num {
-            font-size: clamp(12rem, 38vw, 48rem); 
+            font-size: clamp(10rem, 35vw, 42rem); 
             font-weight: 700; line-height: 0.8;
             margin: 0; cursor: pointer;
-            text-shadow: 0 0 40px rgba(0,0,0,0.5);
+            text-shadow: 0 0 30px rgba(0,0,0,0.5);
+            transition: color 0.1s;
         }
 
     </style>
@@ -117,25 +112,25 @@
 
     <div id="orientation-overlay">
         <div style="font-size: 4rem; margin-bottom: 20px;">📱🔄</div>
-        <h2>PLEASE ROTATE</h2>
-        <p style="color: #666;">Landscape mode is required for the scoreboard.</p>
+        <h2>ROTATE TO LANDSCAPE</h2>
+        <p style="color: #666;">This app is designed for horizontal view only.</p>
     </div>
 
     <div class="main-wrapper">
         <header class="top-nav">
             <div class="logo-text">CHALKY TROUSERS</div>
             <div style="display:flex; gap:10px;">
-                <button class="nav-btn" onclick="toggleFS()">⛶ Fullscreen</button>
-                <button class="nav-btn" style="background:var(--accent-red); border:none;" onclick="resetMatch()">Reset</button>
+                <button class="nav-btn" onpointerdown="event.stopPropagation()" onclick="toggleFS()">⛶ Fullscreen</button>
+                <button class="nav-btn" onpointerdown="event.stopPropagation()" style="background:var(--accent-red); border:none;" onclick="resetMatch()">Reset</button>
             </div>
         </header>
 
         <nav class="names-banner">
-            <div class="name-slot" onclick="changeName('p1-name')">
-                <span id="p1-name">PLAYER 1</span>
+            <div class="name-slot" onpointerdown="event.stopPropagation()" onclick="changeName('p1-txt')">
+                <span id="p1-txt">PLAYER 1</span>
             </div>
-            <div class="name-slot" onclick="changeName('p2-name')">
-                <span id="p2-name">PLAYER 2</span>
+            <div class="name-slot" onpointerdown="event.stopPropagation()" onclick="changeName('p2-txt')">
+                <span id="p2-txt">PLAYER 2</span>
             </div>
         </nav>
 
@@ -151,51 +146,49 @@
                 <div class="score-num" id="s2" 
                      onpointerdown="scStart(event, 's2')" 
                      onpointerup="scEnd(event, 's2')"
-                     onpointerleave="scoreCancel('s2')">0</div>
+                     onpointerleave="scCancel('s2')">0</div>
             </section>
         </main>
     </div>
 
     <script>
         // --- NAME EDITING ---
-        // Using a system prompt is the ONLY way to guarantee 100% isolation 
-        // from the scoring screen on Android/TV browsers.
         function changeName(id) {
             const el = document.getElementById(id);
-            const newName = prompt("Enter Player Name:", el.innerText);
-            if (newName !== null && newName.trim() !== "") {
-                el.innerText = newName.toUpperCase();
+            const res = prompt("Enter Name:", el.innerText);
+            if (res !== null && res.trim() !== "") {
+                el.innerText = res.toUpperCase();
             }
         }
 
-        // --- SCORE INTERACTION ---
-        let hTimer;
-        let isH = false;
+        // --- SCORE LOGIC ---
+        let holdT;
+        let isHold = false;
 
         function scStart(e, id) {
             e.preventDefault(); 
-            isH = false;
-            hTimer = setTimeout(() => {
-                isH = true;
+            isHold = false;
+            holdT = setTimeout(() => {
+                isHold = true;
                 update(id, -1);
                 flash(id, '#ff4444');
             }, 600);
         }
 
         function scEnd(e, id) {
-            clearTimeout(hTimer);
-            if (!isH) {
+            clearTimeout(holdT);
+            if (!isHold) {
                 update(id, 1);
                 flash(id, '#22ff6d');
             }
         }
 
-        function scCancel(id) { clearTimeout(hTimer); }
+        function scCancel(id) { clearTimeout(holdT); }
 
         function update(id, n) {
             const el = document.getElementById(id);
-            let v = parseInt(el.innerText) + n;
-            el.innerText = v < 0 ? 0 : v;
+            let val = parseInt(el.innerText) + n;
+            el.innerText = val < 0 ? 0 : val;
         }
 
         function flash(id, color) {
@@ -215,7 +208,7 @@
         }
 
         function toggleFS() {
-            if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+            if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(e => console.log(e));
             else document.exitFullscreen();
         }
 
