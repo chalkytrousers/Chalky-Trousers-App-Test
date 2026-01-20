@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <link rel="manifest" href="manifest.json?v=25">
+    <link rel="manifest" href="manifest.json?v=27">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#0f0f0f">
+    <meta name="theme-color" content="#000000">
 
     <title>Chalky Trousers Scoreboard</title>
     
@@ -18,12 +18,12 @@
 
     <style>
         :root {
-            --bg-dark: #0f0f0f;
-            --banner-bg: #151515;
+            --bg-dark: #000000;
+            --banner-bg: #111111;
             --accent-green: #22ff6d;
             --accent-red: #ff4444;
             --border-color: rgba(255, 255, 255, 0.1);
-            --middle-width: clamp(70px, 10vw, 110px);
+            --middle-width: clamp(80px, 12vw, 140px);
             --nav-h: 50px;
             --name-h: 50px;
         }
@@ -33,12 +33,13 @@
             user-select: none !important;
             -webkit-user-select: none !important;
             -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
+            /* Tells iOS to ignore system gestures like swiping */
+            touch-action: none; 
         }
 
         body, html {
             margin: 0; padding: 0;
-            height: 100%; width: 100vw;
+            height: 100dvh; width: 100vw;
             background: var(--bg-dark);
             color: white; font-family: 'Chakra Petch', sans-serif;
             overflow: hidden;
@@ -57,23 +58,27 @@
         }
 
         .main-wrapper {
-            display: flex; flex-direction: column; height: 100dvh; width: 100%;
-            background-image: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%);
-            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+            display: flex; flex-direction: column; 
+            height: 100dvh; width: 100%;
+            background-image: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
+            /* Protects content from the iPhone gesture bar area */
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
+            padding-bottom: env(safe-area-inset-bottom);
         }
 
         .top-nav {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 0 20px; height: var(--nav-h);
-            background: rgba(0, 0, 0, 0.4); border-bottom: 1px solid var(--border-color);
+            padding: 0 30px; height: var(--nav-h);
+            background: rgba(0, 0, 0, 0.6); border-bottom: 1px solid var(--border-color);
             position: relative; z-index: 100; flex-shrink: 0;
         }
 
-        .logo-text { font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; color: rgba(255,255,255,0.4); }
+        .logo-text { font-size: 0.9rem; font-weight: 700; letter-spacing: 2px; color: rgba(255,255,255,0.4); }
         
         .nav-btn {
             background: #222; border: 1px solid #444; color: white;
-            padding: 5px 12px; border-radius: 4px; cursor: pointer; font-family: inherit; font-size: 0.75rem;
+            padding: 6px 14px; border-radius: 4px; cursor: pointer; font-family: inherit; font-size: 0.8rem;
         }
 
         .names-banner {
@@ -85,63 +90,63 @@
 
         .name-slot {
             flex: 1; display: flex; justify-content: center; align-items: center;
-            font-size: clamp(0.9rem, 2vw, 1.8rem); text-transform: uppercase; color: #888;
+            font-size: clamp(1rem, 2.5vw, 2.2rem); text-transform: uppercase; color: #888;
             cursor: pointer; overflow: hidden; white-space: nowrap;
         }
         .name-spacer { width: var(--middle-width); flex-shrink: 0; }
 
         .scores-area { display: flex; flex: 1; width: 100%; position: relative; z-index: 10; overflow: hidden; }
 
-        .score-pane { flex: 1; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        .score-pane { flex: 1; display: flex; justify-content: center; align-items: center; }
 
         .middle-banner {
             width: var(--middle-width);
             display: flex; flex-direction: column;
-            align-items: center; justify-content: space-between;
-            padding: 10px 5px;
-            background: rgba(0,0,0,0.3);
+            align-items: center; justify-content: center;
+            gap: 40px;
+            background: rgba(0,0,0,0.4);
             border-left: 1px solid var(--border-color);
             border-right: 1px solid var(--border-color);
             z-index: 100; flex-shrink: 0;
         }
 
         .break-container { text-align: center; }
-        .break-label { font-size: 0.6rem; color: #666; letter-spacing: 1px; margin-bottom: 2px; }
+        .break-label { font-size: 0.7rem; color: #666; letter-spacing: 2px; margin-bottom: 5px; }
         .break-arrow {
-            font-size: 2.2rem; color: var(--accent-green); cursor: pointer;
-            text-shadow: 0 0 10px rgba(34, 255, 109, 0.4);
+            font-size: 3rem; color: var(--accent-green); cursor: pointer;
+            text-shadow: 0 0 15px rgba(34, 255, 109, 0.4);
         }
 
-        .middle-logo { width: 85%; height: auto; opacity: 0.8; margin-bottom: 5px; }
+        .middle-logo { width: 90%; height: auto; opacity: 0.9; }
 
         .score-num {
-            font-size: clamp(8rem, 32vw, 35rem); 
-            font-weight: 700; line-height: 1;
+            font-size: clamp(10rem, 35vw, 42rem); 
+            font-weight: 700; line-height: 0.8;
             margin: 0; cursor: pointer;
-            text-shadow: 0 0 30px rgba(0,0,0,0.6);
+            text-shadow: 0 0 40px rgba(0,0,0,0.8);
         }
 
-        /* iOS PSEUDO-FULLSCREEN (Only for regular browser use) */
-        body.ios-pseudo-fs .top-nav,
-        body.ios-pseudo-fs .names-banner {
+        /* FULLSCREEN/FOCUS MODE */
+        body.fullscreen-focus .top-nav,
+        body.fullscreen-focus .names-banner {
             display: none !important;
         }
         
-        #ios-exit-fs {
+        #exit-focus {
             display: none;
             position: fixed;
-            top: 10px;
-            right: 10px;
+            top: 20px;
+            right: 20px;
             z-index: 1000;
-            background: rgba(0,0,0,0.7);
+            background: rgba(0,0,0,0.8);
             border: 1px solid var(--border-color);
             color: #fff;
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 0.7rem;
-            backdrop-filter: blur(4px);
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            backdrop-filter: blur(5px);
         }
-        body.ios-pseudo-fs #ios-exit-fs { display: block; }
+        body.fullscreen-focus #exit-focus { display: block; }
 
     </style>
 </head>
@@ -153,13 +158,13 @@
         <p style="color: #666;">Chalky Trousers Scoreboard requires horizontal view.</p>
     </div>
 
-    <button id="ios-exit-fs" onpointerdown="event.stopPropagation()" onclick="toggleFS()">✕ Show Controls</button>
+    <button id="exit-focus" onpointerdown="event.stopPropagation()" onclick="toggleFS()">✕ Show Controls</button>
 
     <div class="main-wrapper">
         <header class="top-nav">
             <div class="logo-text">CHALKY TROUSERS</div>
             <div style="display:flex; gap:10px;">
-                <button class="nav-btn" id="fs-btn" onpointerdown="event.stopPropagation()" onclick="toggleFS()">⛶ Fullscreen</button>
+                <button class="nav-btn" onpointerdown="event.stopPropagation()" onclick="toggleFS()">⛶ Fullscreen</button>
                 <button class="nav-btn" onpointerdown="event.stopPropagation()" style="background:var(--accent-red); border:none;" onclick="resetMatch()">Reset</button>
             </div>
         </header>
@@ -187,7 +192,8 @@
                     <div class="break-label">BREAK</div>
                     <div class="break-arrow" id="break-arrow" onpointerdown="event.stopPropagation()" onclick="toggleBreak()">◀</div>
                 </div>
-                <img src="assets/ct-logo-text.png" class="middle-logo" alt="Logo">
+                
+                <img src="assets/ct-logo-text.png" class="middle-logo" alt="Logo" onerror="this.src='assets/ct-logo-text.jpg'">
             </section>
 
             <section class="score-pane">
@@ -200,7 +206,6 @@
     </div>
 
     <script>
-        // --- STORAGE ---
         function saveToStorage() {
             const data = {
                 s1: document.getElementById('s1').innerText,
@@ -225,7 +230,6 @@
             }
         }
 
-        // --- MATCH ---
         let breakSide = 1; 
         const arrowEl = document.getElementById('break-arrow');
 
@@ -248,7 +252,6 @@
             }
         }
 
-        // --- SCORING ---
         let holdT;
         let isHold = false;
 
@@ -289,32 +292,26 @@
         }
 
         function resetMatch() {
-            if (confirm("Reset current match?")) {
+            if (confirm("Reset current match scores?")) {
                 document.getElementById('s1').innerText = "0";
                 document.getElementById('s2').innerText = "0";
                 saveToStorage();
             }
         }
 
-        // --- FULLSCREEN LOGIC ---
         function toggleFS() {
             const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
             const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 
-            // If already in Home Screen app mode, don't hide anything!
-            if (isStandalone) {
-                alert("Already in Fullscreen App Mode!");
+            if (isStandalone || isIOS) {
+                document.body.classList.toggle('fullscreen-focus');
                 return;
             }
 
-            if (isIOS) {
-                document.body.classList.toggle('ios-pseudo-fs');
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(e => console.log(e));
             } else {
-                if (!document.fullscreenElement) {
-                    document.documentElement.requestFullscreen().catch(e => console.log(e));
-                } else {
-                    document.exitFullscreen();
-                }
+                document.exitFullscreen();
             }
         }
 
@@ -327,13 +324,12 @@
         window.addEventListener('load', () => {
             checkOrient();
             loadFromStorage();
-            
-            // If in standalone mode, hide the FS button entirely to avoid confusion
-            const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
-            if (isStandalone) {
-                document.getElementById('fs-btn').style.display = 'none';
-            }
         });
+
+        // Prevent double-tap to zoom on iOS
+        document.addEventListener('touchstart', (e) => {
+            if (e.touches.length > 1) e.preventDefault();
+        }, { passive: false });
 
         window.oncontextmenu = (e) => { if(e.target.classList.contains('score-num')) e.preventDefault(); };
     </script>
