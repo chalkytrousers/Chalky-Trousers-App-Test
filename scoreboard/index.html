@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <link rel="manifest" href="manifest.json?v=36">
+    <link rel="manifest" href="manifest.json?v=34">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -14,7 +14,7 @@
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
         :root {
@@ -23,9 +23,9 @@
             --accent-green: #22ff6d;
             --accent-red-subtle: rgba(255, 68, 68, 0.2);
             --border-color: rgba(255, 255, 255, 0.1);
-            --middle-width: clamp(80px, 12vw, 130px);
+            --middle-width: clamp(75px, 11vw, 120px); /* Slightly wider for the dropdown */
             --nav-h: 45px;
-            --name-h: 60px;
+            --name-h: 60px; /* Taller banner for bigger names */
         }
 
         * {
@@ -64,6 +64,7 @@
             padding-bottom: env(safe-area-inset-bottom);
         }
 
+        /* TOP NAVIGATION */
         .top-nav {
             display: flex; justify-content: space-between; align-items: center;
             padding: 0 20px; height: var(--nav-h);
@@ -78,10 +79,15 @@
             padding: 4px 12px; border-radius: 4px; cursor: pointer; font-family: inherit; font-size: 0.7rem;
             transition: all 0.2s;
         }
-        .nav-btn.reset { background: var(--accent-red-subtle); border: 1px solid rgba(255, 68, 68, 0.3); color: rgba(255, 255, 255, 0.7); }
+        .nav-btn.reset { 
+            background: var(--accent-red-subtle); 
+            border: 1px solid rgba(255, 68, 68, 0.3); 
+            color: rgba(255, 255, 255, 0.7);
+        }
 
         #fs-btn { display: none; }
 
+        /* NAMES BANNER */
         .names-banner {
             display: flex; height: var(--name-h);
             background: var(--banner-bg);
@@ -91,16 +97,22 @@
 
         .name-slot {
             flex: 1; display: flex; justify-content: center; align-items: center;
-            font-size: clamp(1.5rem, 4vw, 3rem); font-weight: 900; 
+            /* MASSIVE font size with clamping so it fits on phone but huge on TV */
+            font-size: clamp(1.5rem, 4vw, 3rem); 
+            font-weight: 900; /* Extra Bold */
             text-transform: uppercase; color: #bbb;
             cursor: pointer; overflow: hidden; white-space: nowrap;
-            letter-spacing: 1px; padding: 0 10px;
+            letter-spacing: 1px;
+            padding: 0 10px;
         }
         .name-spacer { width: var(--middle-width); flex-shrink: 0; }
 
+        /* SCORES AREA */
         .scores-area { display: flex; flex: 1; width: 100%; position: relative; z-index: 10; overflow: hidden; }
+
         .score-pane { flex: 1; display: flex; justify-content: center; align-items: center; overflow: hidden; }
 
+        /* MIDDLE BANNER */
         .middle-banner {
             width: var(--middle-width);
             display: flex; flex-direction: column;
@@ -112,26 +124,27 @@
             z-index: 100; flex-shrink: 0;
         }
 
-        .middle-section { text-align: center; width: 100%; }
-        .middle-label { font-size: 0.75rem; font-weight: 700; color: #888; letter-spacing: 1px; margin-bottom: 4px; text-transform: uppercase; }
+        .break-container { text-align: center; }
+        /* Bigger and Bolder Break Label */
+        .break-label { font-size: 0.9rem; font-weight: 700; color: #888; letter-spacing: 1px; margin-bottom: 8px; }
         
-        /* Tightened gap for Break section */
-        .break-label-tight { margin-bottom: 0px; } 
-
         .break-arrow-svg {
             width: 36px; height: 36px; fill: var(--accent-green);
             cursor: pointer; filter: drop-shadow(0 0 8px rgba(34, 255, 109, 0.6));
             transition: transform 0.1s;
         }
+        .break-arrow-svg:active { transform: scale(0.9); }
         .flipped { transform: scaleX(-1); }
+        .flipped:active { transform: scaleX(-1) scale(0.9); }
 
-        .mid-select {
+        /* RULESET DROPDOWN STYLE */
+        .rules-select {
             background: #222; border: 1px solid #444; color: #aaa;
-            padding: 6px 2px; border-radius: 4px;
+            padding: 6px 4px; border-radius: 4px;
             font-family: 'Chakra Petch', sans-serif;
             font-size: 0.8rem; font-weight: 700; text-transform: uppercase;
-            width: 95%; text-align: center; outline: none;
-            -webkit-appearance: none; appearance: none;
+            margin: 10px 0; width: 95%; text-align: center; outline: none;
+            -webkit-appearance: none; appearance: none; /* Removes default OS styling */
             cursor: pointer;
         }
 
@@ -144,8 +157,25 @@
             text-shadow: 0 0 30px rgba(0,0,0,0.6);
         }
 
-        body.fullscreen-focus .top-nav, body.fullscreen-focus .names-banner { display: none !important; }
-        #exit-focus { display: none; position: fixed; top: 10px; right: 10px; z-index: 1000; background: rgba(0,0,0,0.7); border: 1px solid var(--border-color); color: #fff; padding: 6px 10px; border-radius: 6px; font-size: 0.7rem; backdrop-filter: blur(4px); }
+        body.fullscreen-focus .top-nav,
+        body.fullscreen-focus .names-banner {
+            display: none !important;
+        }
+        
+        #exit-focus {
+            display: none;
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+            background: rgba(0,0,0,0.7);
+            border: 1px solid var(--border-color);
+            color: #fff;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            backdrop-filter: blur(4px);
+        }
         body.fullscreen-focus #exit-focus { display: block; }
     </style>
 </head>
@@ -187,8 +217,8 @@
             </section>
 
             <section class="middle-banner">
-                <div class="middle-section">
-                    <div class="middle-label break-label-tight">BREAK</div>
+                <div class="break-container">
+                    <div class="break-label">BREAK</div>
                     <div id="arrow-wrap" onpointerdown="event.stopPropagation()" onclick="toggleBreak()">
                         <svg id="svg-arrow" class="break-arrow-svg" viewBox="0 0 24 24">
                             <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/>
@@ -196,35 +226,17 @@
                     </div>
                 </div>
 
-                <div class="middle-section">
-                    <div class="middle-label">RACE TO:</div>
-                    <select id="race-to-select" class="mid-select" onchange="saveToStorage()">
-                        <option value="-">-</option>
-                        <option value="1">1</option>
-                        <option value="3">3</option>
-                        <option value="5">5</option>
-                        <option value="7">7</option>
-                        <option value="9">9</option>
-                        <option value="11">11</option>
-                        <option value="13">13</option>
-                        <option value="15">15</option>
-                        <option value="17">17</option>
-                        <option value="19">19</option>
-                        <option value="21">21</option>
-                    </select>
-                </div>
+                <select id="ruleset-select" class="rules-select" onchange="changeRuleset()">
+                    <option value="uk8">uk8</option>
+                    <option value="wpa">wpa</option>
+                    <option value="ultimate">ultimate</option>
+                    <option value="custom">custom</option>
+                </select>
 
-                <div class="middle-section">
-                    <div class="middle-label">RULES</div>
-                    <select id="ruleset-select" class="mid-select" onchange="saveToStorage()">
-                        <option value="uk8">uk8</option>
-                        <option value="wpa">wpa</option>
-                        <option value="ultimate">ultimate</option>
-                        <option value="custom">custom</option>
-                    </select>
-                </div>
-
-                <img id="logo-img" src="https://chalkytrousers.github.io/Chalky-Trousers-App-Test/assets/ct-logo-text.png?v=205" class="middle-logo" alt="Logo">
+                <img id="logo-img" 
+                     src="https://chalkytrousers.github.io/Chalky-Trousers-App-Test/assets/ct-logo-text.png?v=205" 
+                     class="middle-logo" 
+                     alt="Logo">
             </section>
 
             <section class="score-pane">
@@ -237,6 +249,7 @@
     </div>
 
     <script>
+        // Storage Key Updated for V8
         const STORAGE_KEY = 'ct_v8_data';
 
         function saveToStorage() {
@@ -246,8 +259,8 @@
                 p1: document.getElementById('p1-txt').innerText,
                 p2: document.getElementById('p2-txt').innerText,
                 side: breakSide,
-                rules: document.getElementById('ruleset-select').value,
-                race: document.getElementById('race-to-select').value
+                // Save selected ruleset
+                rules: document.getElementById('ruleset-select').value
             };
             localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
         }
@@ -262,31 +275,124 @@
                 document.getElementById('p2-txt').innerText = data.p2 || "PLAYER 2";
                 breakSide = data.side || 1;
                 updateArrow();
+                // Load saved ruleset or default to uk8
                 document.getElementById('ruleset-select').value = data.rules || "uk8";
-                document.getElementById('race-to-select').value = data.race || "-";
             }
         }
 
+        // --- CONTROLS ---
         let breakSide = 1; 
-        function toggleBreak() { breakSide = breakSide === 1 ? 2 : 1; updateArrow(); saveToStorage(); }
-        function updateArrow() { const arrow = document.getElementById('svg-arrow'); if (breakSide === 1) arrow.classList.remove('flipped'); else arrow.classList.add('flipped'); }
 
-        function changeName(id) { const el = document.getElementById(id); const res = prompt("Enter Name:", el.innerText); if (res !== null && res.trim() !== "") { el.innerText = res.toUpperCase(); saveToStorage(); } }
+        function toggleBreak() {
+            breakSide = breakSide === 1 ? 2 : 1;
+            updateArrow();
+            saveToStorage();
+        }
 
-        let holdT, isHold = false;
-        function scStart(e, id) { e.preventDefault(); document.activeElement.blur(); isHold = false; holdT = setTimeout(() => { isHold = true; update(id, -1); flash(id, '#ff4444'); }, 600); }
-        function scEnd(e, id) { clearTimeout(holdT); if (!isHold) { update(id, 1); flash(id, '#22ff6d'); } }
+        function updateArrow() {
+            const arrow = document.getElementById('svg-arrow');
+            if (breakSide === 1) {
+                arrow.classList.remove('flipped');
+            } else {
+                arrow.classList.add('flipped');
+            }
+        }
+
+        function changeRuleset() {
+            saveToStorage();
+            // Optional: Vibrate on change for feedback
+            if ("vibrate" in navigator) navigator.vibrate(20);
+        }
+
+        function changeName(id) {
+            const el = document.getElementById(id);
+            const res = prompt("Enter Name:", el.innerText);
+            if (res !== null && res.trim() !== "") {
+                el.innerText = res.toUpperCase();
+                saveToStorage();
+            }
+        }
+
+        // --- SCORING (Locked V4 Logic) ---
+        let holdT;
+        let isHold = false;
+
+        function scStart(e, id) {
+            e.preventDefault(); 
+            document.activeElement.blur(); 
+            isHold = false;
+            holdT = setTimeout(() => {
+                isHold = true;
+                update(id, -1);
+                flash(id, '#ff4444');
+            }, 600);
+        }
+
+        function scEnd(e, id) {
+            clearTimeout(holdT);
+            if (!isHold) {
+                update(id, 1);
+                flash(id, '#22ff6d');
+            }
+        }
+
         function scCancel(id) { clearTimeout(holdT); }
-        function update(id, n) { const el = document.getElementById(id); let val = parseInt(el.innerText) + n; el.innerText = val < 0 ? 0 : val; saveToStorage(); }
-        function flash(id, color) { const el = document.getElementById(id); const old = el.style.color; el.style.color = color; setTimeout(() => el.style.color = old, 200); }
 
-        function resetMatch() { if (confirm("Reset match?")) { document.getElementById('s1').innerText = "0"; document.getElementById('s2').innerText = "0"; saveToStorage(); } }
+        function update(id, n) {
+            const el = document.getElementById(id);
+            let val = parseInt(el.innerText) + n;
+            el.innerText = val < 0 ? 0 : val;
+            saveToStorage();
+        }
 
-        function toggleFS() { const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); if (isIOS) document.body.classList.toggle('fullscreen-focus'); else { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(e => console.log(e)); else document.exitFullscreen(); } }
+        function flash(id, color) {
+            const el = document.getElementById(id);
+            const old = el.style.color;
+            el.style.color = color;
+            setTimeout(() => el.style.color = old, 200);
+        }
 
-        window.addEventListener('resize', () => { document.getElementById('orientation-overlay').style.display = (window.innerHeight > window.innerWidth) ? 'flex' : 'none'; });
-        window.addEventListener('load', () => { loadFromStorage(); });
-        document.addEventListener('touchstart', (e) => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
+        function resetMatch() {
+            if (confirm("Reset current match scores?")) {
+                document.getElementById('s1').innerText = "0";
+                document.getElementById('s2').innerText = "0";
+                saveToStorage();
+            }
+        }
+
+        function toggleFS() {
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            if (isIOS) {
+                document.body.classList.toggle('fullscreen-focus');
+            } else {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().catch(e => console.log(e));
+                } else {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        function checkOrient() {
+            document.getElementById('orientation-overlay').style.display = 
+                (window.innerHeight > window.innerWidth) ? 'flex' : 'none';
+        }
+
+        window.addEventListener('resize', checkOrient);
+        window.addEventListener('load', () => {
+            checkOrient();
+            loadFromStorage();
+            const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            if (!isStandalone || !isIOS) {
+                document.getElementById('fs-btn').style.display = 'block';
+            }
+        });
+
+        document.addEventListener('touchstart', (e) => {
+            if (e.touches.length > 1) e.preventDefault();
+        }, { passive: false });
+
         window.oncontextmenu = (e) => { if(e.target.classList.contains('score-num')) e.preventDefault(); };
     </script>
 </body>
