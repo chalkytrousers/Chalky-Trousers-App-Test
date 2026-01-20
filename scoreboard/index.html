@@ -162,7 +162,7 @@
                     <div class="break-label">BREAK</div>
                     <div class="break-arrow" id="break-arrow" onpointerdown="event.stopPropagation()" onclick="toggleBreak()">◀</div>
                 </div>
-                <img src="assets/ct-logo-text.png" class="middle-logo" alt="Chalky Logo">
+                <img src="assets/ct-logo-text.png?v=2" class="middle-logo" alt="Chalky Logo">
             </section>
 
             <section class="score-pane">
@@ -261,7 +261,7 @@
         }
 
         function resetMatch() {
-            if (confirm("Reset match scores?")) {
+            if (confirm("Reset current match scores?")) {
                 document.getElementById('s1').innerText = "0";
                 document.getElementById('s2').innerText = "0";
                 saveToStorage();
