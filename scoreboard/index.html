@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <link rel="manifest" href="manifest.json?v=19">
+    <link rel="manifest" href="manifest.json?v=20">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -88,19 +88,16 @@
             font-size: clamp(1rem, 2.5vw, 2rem); text-transform: uppercase; color: #888;
             cursor: pointer;
         }
-        /* Added spacer to match middle banner width */
         .name-spacer { width: var(--middle-width); }
-
 
         /* SCORE AREA */
         .scores-area { display: flex; flex: 1; width: 100%; position: relative; z-index: 10; }
 
         .score-pane {
             flex: 1; display: flex; justify-content: center; align-items: center;
-            /* Border removed here, handled by middle banner */
         }
 
-        /* NEW MIDDLE BANNER */
+        /* MIDDLE BANNER SPLIT */
         .middle-banner {
             width: var(--middle-width);
             display: flex; flex-direction: column;
@@ -109,7 +106,7 @@
             background: rgba(0,0,0,0.2);
             border-left: 1px solid var(--border-color);
             border-right: 1px solid var(--border-color);
-            z-index: 100; /* Ensure clickable over scores */
+            z-index: 100;
         }
 
         .break-container { text-align: center; }
@@ -121,7 +118,6 @@
 
         .middle-logo { width: 80%; height: auto; opacity: 0.5; }
 
-        /* Slightly adjusted score scaling to fit new layout */
         .score-num {
             font-size: clamp(10rem, 30vw, 35rem); 
             font-weight: 700; line-height: 0.8;
@@ -129,7 +125,6 @@
             text-shadow: 0 0 30px rgba(0,0,0,0.5);
             transition: color 0.1s;
         }
-
     </style>
 </head>
 <body>
@@ -172,7 +167,7 @@
                     <div class="break-label">BREAK</div>
                     <div class="break-arrow" id="break-arrow" onpointerdown="event.stopPropagation()" onclick="toggleBreak()">◀</div>
                 </div>
-                <img src="INSERT_LOGO_PATH_HERE" class="middle-logo" alt="Logo">
+                <img src="../assets/Chalky Trousers Logo (Text) 800x500 HR_20250927_180240_0001.png" class="middle-logo" alt="CT Logo">
             </section>
 
             <section class="score-pane">
@@ -185,19 +180,45 @@
     </div>
 
     <script>
+        // --- STORAGE LOGIC ---
+        function saveToStorage() {
+            const data = {
+                s1: document.getElementById('s1').innerText,
+                s2: document.getElementById('s2').innerText,
+                p1: document.getElementById('p1-txt').innerText,
+                p2: document.getElementById('p2-txt').innerText,
+                side: breakSide
+            };
+            localStorage.setItem('ct_scoreboard_data', JSON.stringify(data));
+        }
+
+        function loadFromStorage() {
+            const saved = localStorage.getItem('ct_scoreboard_data');
+            if (saved) {
+                const data = JSON.parse(saved);
+                document.getElementById('s1').innerText = data.s1 || "0";
+                document.getElementById('s2').innerText = data.s2 || "0";
+                document.getElementById('p1-txt').innerText = data.p1 || "PLAYER 1";
+                document.getElementById('p2-txt').innerText = data.p2 || "PLAYER 2";
+                breakSide = data.side || 1;
+                updateArrow();
+            }
+        }
+
         // --- BREAK TOGGLE ---
-        let breakSide = 1; // 1 = Left, 2 = Right
+        let breakSide = 1; 
         const arrowEl = document.getElementById('break-arrow');
 
         function toggleBreak() {
             breakSide = breakSide === 1 ? 2 : 1;
-            arrowEl.innerText = breakSide === 1 ? "◀" : "▶";
+            updateArrow();
+            saveToStorage();
             if ("vibrate" in navigator) navigator.vibrate(20);
         }
 
-        // Initialize Arrow on load
-        toggleBreak(); 
-
+        function updateArrow() {
+            arrowEl.innerText = breakSide === 1 ? "◀" : "▶";
+        }
 
         // --- NAME EDITING ---
         function changeName(id) {
@@ -205,10 +226,11 @@
             const res = prompt("Enter Name:", el.innerText);
             if (res !== null && res.trim() !== "") {
                 el.innerText = res.toUpperCase();
+                saveToStorage();
             }
         }
 
-        // --- SCORE LOGIC (Locked V4 Logic) ---
+        // --- SCORE LOGIC ---
         let holdT;
         let isHold = false;
 
@@ -236,6 +258,7 @@
             const el = document.getElementById(id);
             let val = parseInt(el.innerText) + n;
             el.innerText = val < 0 ? 0 : val;
+            saveToStorage();
         }
 
         function flash(id, color) {
@@ -251,6 +274,7 @@
             if (confirm("Reset scores?")) {
                 document.getElementById('s1').innerText = "0";
                 document.getElementById('s2').innerText = "0";
+                saveToStorage();
             }
         }
 
@@ -263,8 +287,12 @@
             document.getElementById('orientation-overlay').style.display = 
                 (window.innerHeight > window.innerWidth) ? 'flex' : 'none';
         }
+
         window.addEventListener('resize', checkOrient);
-        window.addEventListener('load', checkOrient);
+        window.addEventListener('load', () => {
+            checkOrient();
+            loadFromStorage();
+        });
 
         window.oncontextmenu = (e) => { if(e.target.classList.contains('score-num')) e.preventDefault(); };
     </script>
