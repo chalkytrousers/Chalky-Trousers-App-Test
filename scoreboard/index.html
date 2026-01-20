@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <link rel="manifest" href="manifest.json?v=22">
+    <link rel="manifest" href="manifest.json?v=23">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -42,6 +42,7 @@
             overflow: hidden;
         }
 
+        /* --- ORIENTATION PROMPT --- */
         #orientation-overlay {
             display: none; position: fixed; inset: 0; background: #000;
             z-index: 10000; flex-direction: column; justify-content: center;
@@ -59,6 +60,7 @@
             padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
 
+        /* TOP NAVIGATION */
         .top-nav {
             display: flex; justify-content: space-between; align-items: center;
             padding: 0 30px; height: 50px;
@@ -73,6 +75,7 @@
             padding: 6px 14px; border-radius: 4px; cursor: pointer; font-family: inherit; font-size: 0.8rem;
         }
 
+        /* NAMES BANNER */
         .names-banner {
             display: flex; height: 60px;
             background: var(--banner-bg);
@@ -87,10 +90,12 @@
         }
         .name-spacer { width: var(--middle-width); }
 
+        /* SCORE AREA */
         .scores-area { display: flex; flex: 1; width: 100%; position: relative; z-index: 10; }
 
         .score-pane { flex: 1; display: flex; justify-content: center; align-items: center; }
 
+        /* MIDDLE BANNER */
         .middle-banner {
             width: var(--middle-width);
             display: flex; flex-direction: column;
@@ -109,7 +114,6 @@
             text-shadow: 0 0 15px rgba(34, 255, 109, 0.4);
             transition: transform 0.2s ease;
         }
-        .break-arrow:active { transform: scale(0.9); }
 
         .middle-logo { width: 90%; height: auto; opacity: 0.8; margin-bottom: 10px; }
 
@@ -120,6 +124,31 @@
             text-shadow: 0 0 30px rgba(0,0,0,0.6);
             transition: color 0.1s;
         }
+
+        /* iOS PSEUDO-FULLSCREEN STYLES */
+        body.ios-pseudo-fs .top-nav,
+        body.ios-pseudo-fs .names-banner {
+            display: none !important;
+        }
+        body.ios-pseudo-fs .main-wrapper {
+            padding: 0 !important;
+        }
+        
+        #ios-exit-fs {
+            display: none;
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            z-index: 1000;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid var(--border-color);
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+        }
+        body.ios-pseudo-fs #ios-exit-fs { display: block; }
+
     </style>
 </head>
 <body>
@@ -129,6 +158,8 @@
         <h2>ROTATE TO LANDSCAPE</h2>
         <p style="color: #666;">This app is designed for horizontal view only.</p>
     </div>
+
+    <button id="ios-exit-fs" onpointerdown="event.stopPropagation()" onclick="toggleFS()">✕ Exit Fullscreen</button>
 
     <div class="main-wrapper">
         <header class="top-nav">
@@ -162,7 +193,7 @@
                     <div class="break-label">BREAK</div>
                     <div class="break-arrow" id="break-arrow" onpointerdown="event.stopPropagation()" onclick="toggleBreak()">◀</div>
                 </div>
-                <img src="/Chalky-Trousers-App-Test/assets/ct-logo-text.png" class="middle-logo" alt="Chalky Logo">
+                <img src="assets/ct-logo-text.png" class="middle-logo" alt="Chalky Logo">
             </section>
 
             <section class="score-pane">
@@ -175,6 +206,7 @@
     </div>
 
     <script>
+        // --- PERSISTENCE ---
         function saveToStorage() {
             const data = {
                 s1: document.getElementById('s1').innerText,
@@ -199,6 +231,7 @@
             }
         }
 
+        // --- MATCH LOGIC ---
         let breakSide = 1; 
         const arrowEl = document.getElementById('break-arrow');
 
@@ -206,6 +239,7 @@
             breakSide = breakSide === 1 ? 2 : 1;
             updateArrow();
             saveToStorage();
+            if ("vibrate" in navigator) navigator.vibrate(25);
         }
 
         function updateArrow() {
@@ -261,16 +295,27 @@
         }
 
         function resetMatch() {
-            if (confirm("Reset current match scores?")) {
+            if (confirm("Reset match scores?")) {
                 document.getElementById('s1').innerText = "0";
                 document.getElementById('s2').innerText = "0";
                 saveToStorage();
             }
         }
 
+        // --- FULLSCREEN LOGIC ---
         function toggleFS() {
-            if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(e => console.log(e));
-            else document.exitFullscreen();
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                          (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+            if (isIOS) {
+                document.body.classList.toggle('ios-pseudo-fs');
+            } else {
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().catch(e => console.log(e));
+                } else {
+                    document.exitFullscreen();
+                }
+            }
         }
 
         function checkOrient() {
