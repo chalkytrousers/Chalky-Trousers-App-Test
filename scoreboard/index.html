@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    <link rel="manifest" href="manifest.json?v=23">
+    <link rel="manifest" href="manifest.json?v=25">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -23,7 +23,9 @@
             --accent-green: #22ff6d;
             --accent-red: #ff4444;
             --border-color: rgba(255, 255, 255, 0.1);
-            --middle-width: clamp(80px, 12vw, 130px);
+            --middle-width: clamp(70px, 10vw, 110px);
+            --nav-h: 50px;
+            --name-h: 50px;
         }
 
         * {
@@ -36,13 +38,13 @@
 
         body, html {
             margin: 0; padding: 0;
-            height: 100dvh; width: 100vw;
+            height: 100%; width: 100vw;
             background: var(--bg-dark);
             color: white; font-family: 'Chakra Petch', sans-serif;
             overflow: hidden;
+            position: fixed; 
         }
 
-        /* --- ORIENTATION PROMPT --- */
         #orientation-overlay {
             display: none; position: fixed; inset: 0; background: #000;
             z-index: 10000; flex-direction: column; justify-content: center;
@@ -55,97 +57,89 @@
         }
 
         .main-wrapper {
-            display: flex; flex-direction: column; height: 100%; width: 100%;
+            display: flex; flex-direction: column; height: 100dvh; width: 100%;
             background-image: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%);
             padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
 
-        /* TOP NAVIGATION */
         .top-nav {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 0 30px; height: 50px;
+            padding: 0 20px; height: var(--nav-h);
             background: rgba(0, 0, 0, 0.4); border-bottom: 1px solid var(--border-color);
-            position: relative; z-index: 100; 
+            position: relative; z-index: 100; flex-shrink: 0;
         }
 
-        .logo-text { font-size: 0.9rem; font-weight: 700; letter-spacing: 2px; color: rgba(255,255,255,0.4); }
+        .logo-text { font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; color: rgba(255,255,255,0.4); }
         
         .nav-btn {
             background: #222; border: 1px solid #444; color: white;
-            padding: 6px 14px; border-radius: 4px; cursor: pointer; font-family: inherit; font-size: 0.8rem;
+            padding: 5px 12px; border-radius: 4px; cursor: pointer; font-family: inherit; font-size: 0.75rem;
         }
 
-        /* NAMES BANNER */
         .names-banner {
-            display: flex; height: 60px;
+            display: flex; height: var(--name-h);
             background: var(--banner-bg);
             border-bottom: 1px solid var(--border-color);
-            position: relative; z-index: 100;
+            position: relative; z-index: 100; flex-shrink: 0;
         }
 
         .name-slot {
             flex: 1; display: flex; justify-content: center; align-items: center;
-            font-size: clamp(1rem, 2.5vw, 2rem); text-transform: uppercase; color: #888;
-            cursor: pointer;
+            font-size: clamp(0.9rem, 2vw, 1.8rem); text-transform: uppercase; color: #888;
+            cursor: pointer; overflow: hidden; white-space: nowrap;
         }
-        .name-spacer { width: var(--middle-width); }
+        .name-spacer { width: var(--middle-width); flex-shrink: 0; }
 
-        /* SCORE AREA */
-        .scores-area { display: flex; flex: 1; width: 100%; position: relative; z-index: 10; }
+        .scores-area { display: flex; flex: 1; width: 100%; position: relative; z-index: 10; overflow: hidden; }
 
-        .score-pane { flex: 1; display: flex; justify-content: center; align-items: center; }
+        .score-pane { flex: 1; display: flex; justify-content: center; align-items: center; overflow: hidden; }
 
-        /* MIDDLE BANNER */
         .middle-banner {
             width: var(--middle-width);
             display: flex; flex-direction: column;
             align-items: center; justify-content: space-between;
-            padding: 20px 5px;
+            padding: 10px 5px;
             background: rgba(0,0,0,0.3);
             border-left: 1px solid var(--border-color);
             border-right: 1px solid var(--border-color);
-            z-index: 100;
+            z-index: 100; flex-shrink: 0;
         }
 
         .break-container { text-align: center; }
-        .break-label { font-size: 0.7rem; color: #666; letter-spacing: 2px; margin-bottom: 5px; }
+        .break-label { font-size: 0.6rem; color: #666; letter-spacing: 1px; margin-bottom: 2px; }
         .break-arrow {
-            font-size: 3.2rem; color: var(--accent-green); cursor: pointer;
-            text-shadow: 0 0 15px rgba(34, 255, 109, 0.4);
-            transition: transform 0.2s ease;
+            font-size: 2.2rem; color: var(--accent-green); cursor: pointer;
+            text-shadow: 0 0 10px rgba(34, 255, 109, 0.4);
         }
 
-        .middle-logo { width: 90%; height: auto; opacity: 0.8; margin-bottom: 10px; }
+        .middle-logo { width: 85%; height: auto; opacity: 0.8; margin-bottom: 5px; }
 
         .score-num {
-            font-size: clamp(10rem, 30vw, 38rem); 
-            font-weight: 700; line-height: 0.8;
+            font-size: clamp(8rem, 32vw, 35rem); 
+            font-weight: 700; line-height: 1;
             margin: 0; cursor: pointer;
             text-shadow: 0 0 30px rgba(0,0,0,0.6);
-            transition: color 0.1s;
         }
 
-        /* iOS PSEUDO-FULLSCREEN STYLES */
+        /* iOS PSEUDO-FULLSCREEN (Only for regular browser use) */
         body.ios-pseudo-fs .top-nav,
         body.ios-pseudo-fs .names-banner {
             display: none !important;
-        }
-        body.ios-pseudo-fs .main-wrapper {
-            padding: 0 !important;
         }
         
         #ios-exit-fs {
             display: none;
             position: fixed;
-            top: 15px;
-            right: 15px;
+            top: 10px;
+            right: 10px;
             z-index: 1000;
-            background: rgba(0,0,0,0.6);
+            background: rgba(0,0,0,0.7);
             border: 1px solid var(--border-color);
             color: #fff;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 0.8rem;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            backdrop-filter: blur(4px);
         }
         body.ios-pseudo-fs #ios-exit-fs { display: block; }
 
@@ -156,16 +150,16 @@
     <div id="orientation-overlay">
         <div style="font-size: 4rem; margin-bottom: 20px;">📱🔄</div>
         <h2>ROTATE TO LANDSCAPE</h2>
-        <p style="color: #666;">This app is designed for horizontal view only.</p>
+        <p style="color: #666;">Chalky Trousers Scoreboard requires horizontal view.</p>
     </div>
 
-    <button id="ios-exit-fs" onpointerdown="event.stopPropagation()" onclick="toggleFS()">✕ Exit Fullscreen</button>
+    <button id="ios-exit-fs" onpointerdown="event.stopPropagation()" onclick="toggleFS()">✕ Show Controls</button>
 
     <div class="main-wrapper">
         <header class="top-nav">
             <div class="logo-text">CHALKY TROUSERS</div>
             <div style="display:flex; gap:10px;">
-                <button class="nav-btn" onpointerdown="event.stopPropagation()" onclick="toggleFS()">⛶ Fullscreen</button>
+                <button class="nav-btn" id="fs-btn" onpointerdown="event.stopPropagation()" onclick="toggleFS()">⛶ Fullscreen</button>
                 <button class="nav-btn" onpointerdown="event.stopPropagation()" style="background:var(--accent-red); border:none;" onclick="resetMatch()">Reset</button>
             </div>
         </header>
@@ -193,7 +187,7 @@
                     <div class="break-label">BREAK</div>
                     <div class="break-arrow" id="break-arrow" onpointerdown="event.stopPropagation()" onclick="toggleBreak()">◀</div>
                 </div>
-                <img src="assets/ct-logo-text.png" class="middle-logo" alt="Chalky Logo">
+                <img src="assets/ct-logo-text.png" class="middle-logo" alt="Logo">
             </section>
 
             <section class="score-pane">
@@ -206,7 +200,7 @@
     </div>
 
     <script>
-        // --- PERSISTENCE ---
+        // --- STORAGE ---
         function saveToStorage() {
             const data = {
                 s1: document.getElementById('s1').innerText,
@@ -231,7 +225,7 @@
             }
         }
 
-        // --- MATCH LOGIC ---
+        // --- MATCH ---
         let breakSide = 1; 
         const arrowEl = document.getElementById('break-arrow');
 
@@ -239,7 +233,6 @@
             breakSide = breakSide === 1 ? 2 : 1;
             updateArrow();
             saveToStorage();
-            if ("vibrate" in navigator) navigator.vibrate(25);
         }
 
         function updateArrow() {
@@ -255,6 +248,7 @@
             }
         }
 
+        // --- SCORING ---
         let holdT;
         let isHold = false;
 
@@ -295,7 +289,7 @@
         }
 
         function resetMatch() {
-            if (confirm("Reset match scores?")) {
+            if (confirm("Reset current match?")) {
                 document.getElementById('s1').innerText = "0";
                 document.getElementById('s2').innerText = "0";
                 saveToStorage();
@@ -304,8 +298,14 @@
 
         // --- FULLSCREEN LOGIC ---
         function toggleFS() {
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-                          (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+            // If already in Home Screen app mode, don't hide anything!
+            if (isStandalone) {
+                alert("Already in Fullscreen App Mode!");
+                return;
+            }
 
             if (isIOS) {
                 document.body.classList.toggle('ios-pseudo-fs');
@@ -327,6 +327,12 @@
         window.addEventListener('load', () => {
             checkOrient();
             loadFromStorage();
+            
+            // If in standalone mode, hide the FS button entirely to avoid confusion
+            const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+            if (isStandalone) {
+                document.getElementById('fs-btn').style.display = 'none';
+            }
         });
 
         window.oncontextmenu = (e) => { if(e.target.classList.contains('score-num')) e.preventDefault(); };
