@@ -23,7 +23,7 @@
             --accent-green: #22ff6d;
             --accent-red: #ff4444;
             --border-color: rgba(255, 255, 255, 0.1);
-            --middle-width: clamp(80px, 12vw, 120px);
+            --middle-width: clamp(80px, 12vw, 130px);
         }
 
         * {
@@ -42,7 +42,7 @@
             overflow: hidden;
         }
 
-        /* --- ORIENTATION PROMPT --- */
+        /* HARDENED ROTATION PROMPT */
         #orientation-overlay {
             display: none; position: fixed; inset: 0; background: #000;
             z-index: 10000; flex-direction: column; justify-content: center;
@@ -93,9 +93,7 @@
         /* SCORE AREA */
         .scores-area { display: flex; flex: 1; width: 100%; position: relative; z-index: 10; }
 
-        .score-pane {
-            flex: 1; display: flex; justify-content: center; align-items: center;
-        }
+        .score-pane { flex: 1; display: flex; justify-content: center; align-items: center; }
 
         /* MIDDLE BANNER SPLIT */
         .middle-banner {
@@ -103,26 +101,28 @@
             display: flex; flex-direction: column;
             align-items: center; justify-content: space-between;
             padding: 20px 5px;
-            background: rgba(0,0,0,0.2);
+            background: rgba(0,0,0,0.3);
             border-left: 1px solid var(--border-color);
             border-right: 1px solid var(--border-color);
             z-index: 100;
         }
 
         .break-container { text-align: center; }
-        .break-label { font-size: 0.8rem; color: #888; letter-spacing: 2px; margin-bottom: 5px; }
+        .break-label { font-size: 0.7rem; color: #666; letter-spacing: 2px; margin-bottom: 5px; }
         .break-arrow {
-            font-size: 3rem; color: var(--accent-green); cursor: pointer;
-            text-shadow: 0 0 10px var(--accent-green);
+            font-size: 3.2rem; color: var(--accent-green); cursor: pointer;
+            text-shadow: 0 0 15px rgba(34, 255, 109, 0.4);
+            transition: transform 0.2s ease;
         }
+        .break-arrow:active { transform: scale(0.9); }
 
-        .middle-logo { width: 80%; height: auto; opacity: 0.5; }
+        .middle-logo { width: 90%; height: auto; opacity: 0.7; margin-bottom: 10px; }
 
         .score-num {
-            font-size: clamp(10rem, 30vw, 35rem); 
+            font-size: clamp(10rem, 30vw, 38rem); 
             font-weight: 700; line-height: 0.8;
             margin: 0; cursor: pointer;
-            text-shadow: 0 0 30px rgba(0,0,0,0.5);
+            text-shadow: 0 0 30px rgba(0,0,0,0.6);
             transition: color 0.1s;
         }
     </style>
@@ -132,7 +132,7 @@
     <div id="orientation-overlay">
         <div style="font-size: 4rem; margin-bottom: 20px;">📱🔄</div>
         <h2>ROTATE TO LANDSCAPE</h2>
-        <p style="color: #666;">This app is designed for horizontal view only.</p>
+        <p style="color: #666;">Chalky Trousers Scoreboard requires horizontal view.</p>
     </div>
 
     <div class="main-wrapper">
@@ -167,7 +167,8 @@
                     <div class="break-label">BREAK</div>
                     <div class="break-arrow" id="break-arrow" onpointerdown="event.stopPropagation()" onclick="toggleBreak()">◀</div>
                 </div>
-                <img src="../assets/Chalky Trousers Logo (Text) 800x500 HR_20250927_180240_0001.png" class="middle-logo" alt="CT Logo">
+                
+                <img src="assets/Chalky Trousers Logo (Text) 800x500 HR_20260120_122527_0000.png" class="middle-logo" alt="Chalky Logo">
             </section>
 
             <section class="score-pane">
@@ -189,11 +190,11 @@
                 p2: document.getElementById('p2-txt').innerText,
                 side: breakSide
             };
-            localStorage.setItem('ct_scoreboard_data', JSON.stringify(data));
+            localStorage.setItem('ct_v6_data', JSON.stringify(data));
         }
 
         function loadFromStorage() {
-            const saved = localStorage.getItem('ct_scoreboard_data');
+            const saved = localStorage.getItem('ct_v6_data');
             if (saved) {
                 const data = JSON.parse(saved);
                 document.getElementById('s1').innerText = data.s1 || "0";
@@ -213,7 +214,7 @@
             breakSide = breakSide === 1 ? 2 : 1;
             updateArrow();
             saveToStorage();
-            if ("vibrate" in navigator) navigator.vibrate(20);
+            if ("vibrate" in navigator) navigator.vibrate(25);
         }
 
         function updateArrow() {
@@ -266,12 +267,12 @@
             const old = el.style.color;
             el.style.color = color;
             setTimeout(() => el.style.color = old, 200);
-            if ("vibrate" in navigator) navigator.vibrate(color === '#ff4444' ? 40 : 15);
+            if ("vibrate" in navigator) navigator.vibrate(color === '#ff4444' ? 45 : 20);
         }
 
         // --- UTILS ---
         function resetMatch() {
-            if (confirm("Reset scores?")) {
+            if (confirm("Clear current match scores?")) {
                 document.getElementById('s1').innerText = "0";
                 document.getElementById('s2').innerText = "0";
                 saveToStorage();
