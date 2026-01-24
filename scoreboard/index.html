@@ -3,17 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    
-    <link rel="manifest" href="manifest.json?v=36">
-    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="manifest.json?v=38">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#000000">
-
     <title>Chalky Trousers Scoreboard</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;700;900&display=swap" rel="stylesheet">
 
     <style>
@@ -23,283 +17,114 @@
             --accent-green: #22ff6d;
             --accent-red-subtle: rgba(255, 68, 68, 0.2);
             --border-color: rgba(255, 255, 255, 0.1);
-            --middle-width: clamp(80px, 12vw, 130px);
+            --middle-width: clamp(85px, 13vw, 140px);
             --nav-h: 45px;
-            --name-h: 60px;
+            --name-h: 65px;
         }
 
-        * {
-            box-sizing: border-box;
-            user-select: none !important;
-            -webkit-user-select: none !important;
-            -webkit-tap-highlight-color: transparent;
-            touch-action: none; 
-        }
+        * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; touch-action: none; }
 
         body, html {
-            margin: 0; padding: 0;
-            height: 100%; width: 100vw;
-            background: var(--bg-dark);
-            color: white; font-family: 'Chakra Petch', sans-serif;
-            overflow: hidden;
-            position: fixed; 
+            margin: 0; padding: 0; height: 100%; width: 100vw;
+            background: var(--bg-dark); color: white; font-family: 'Chakra Petch', sans-serif;
+            overflow: hidden; position: fixed;
         }
 
-        #orientation-overlay {
-            display: none; position: fixed; inset: 0; background: #000;
-            z-index: 10000; flex-direction: column; justify-content: center;
-            align-items: center; text-align: center;
-        }
-
-        @media screen and (orientation: portrait) {
-            #orientation-overlay { display: flex !important; }
-            .main-wrapper { display: none !important; }
-        }
-
+        /* Safe Area Padding to prevent TV/Notch clipping */
         .main-wrapper {
             display: flex; flex-direction: column; height: 100dvh; width: 100%;
             background-image: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
-            padding-left: env(safe-area-inset-left);
-            padding-right: env(safe-area-inset-right);
-            padding-bottom: env(safe-area-inset-bottom);
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
 
         .top-nav {
             display: flex; justify-content: space-between; align-items: center;
             padding: 0 20px; height: var(--nav-h);
-            background: rgba(0, 0, 0, 0.4); border-bottom: 1px solid var(--border-color);
-            position: relative; z-index: 100; flex-shrink: 0;
+            border-bottom: 1px solid var(--border-color); flex-shrink: 0;
+            margin-top: 5px; /* Extra buffer for TV Overscan */
         }
 
-        .logo-text { font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; color: rgba(255,255,255,0.4); }
-        
-        .nav-btn {
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #888;
-            padding: 4px 12px; border-radius: 4px; cursor: pointer; font-family: inherit; font-size: 0.7rem;
-            transition: all 0.2s;
-        }
-        .nav-btn.reset { background: var(--accent-red-subtle); border: 1px solid rgba(255, 68, 68, 0.3); color: rgba(255, 255, 255, 0.7); }
+        .logo-text { font-size: 0.75rem; font-weight: 700; color: rgba(255,255,255,0.4); }
+        .nav-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #888; padding: 4px 12px; border-radius: 4px; font-size: 0.7rem; }
+        .nav-btn.reset { background: var(--accent-red-subtle); border: 1px solid rgba(255, 68, 68, 0.3); color: white; }
 
-        /* Fullscreen button display is handled in script to protect Android view */
-        #fs-btn { display: none; }
+        .names-banner { display: flex; height: var(--name-h); background: var(--banner-bg); border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
+        .name-slot { flex: 1; display: flex; justify-content: center; align-items: center; font-size: clamp(1.8rem, 4.5vw, 3.5rem); font-weight: 900; text-transform: uppercase; color: #bbb; overflow: hidden; white-space: nowrap; }
+        .name-spacer { width: var(--middle-width); }
 
-        .names-banner {
-            display: flex; height: var(--name-h);
-            background: var(--banner-bg);
-            border-bottom: 1px solid var(--border-color);
-            position: relative; z-index: 100; flex-shrink: 0;
-        }
-
-        .name-slot {
-            flex: 1; display: flex; justify-content: center; align-items: center;
-            font-size: clamp(1.8rem, 4.5vw, 3.5rem); font-weight: 900; 
-            text-transform: uppercase; color: #bbb;
-            cursor: pointer; overflow: hidden; white-space: nowrap;
-            letter-spacing: 1px; padding: 0 10px;
-        }
-        .name-spacer { width: var(--middle-width); flex-shrink: 0; }
-
-        .scores-area { display: flex; flex: 1; width: 100%; position: relative; z-index: 10; overflow: hidden; }
-        .score-pane { flex: 1; display: flex; justify-content: center; align-items: center; overflow: hidden; }
+        .scores-area { display: flex; flex: 1; width: 100%; overflow: hidden; }
+        .score-pane { flex: 1; display: flex; justify-content: center; align-items: center; }
 
         .middle-banner {
-            width: var(--middle-width);
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: space-between;
-            padding: 12px 5px;
-            background: rgba(0,0,0,0.3);
-            border-left: 1px solid var(--border-color);
-            border-right: 1px solid var(--border-color);
-            z-index: 100; flex-shrink: 0;
+            width: var(--middle-width); display: flex; flex-direction: column;
+            align-items: center; justify-content: center; gap: 1vh; /* Fluid gap based on height */
+            padding: 10px 5px; background: rgba(0,0,0,0.3);
+            border-left: 1px solid var(--border-color); border-right: 1px solid var(--border-color);
         }
 
         .middle-section { text-align: center; width: 100%; }
-        .middle-label { font-size: 0.8rem; font-weight: 700; color: #888; letter-spacing: 1px; margin-bottom: 0px; text-transform: uppercase; }
-        
-        .break-arrow-svg {
-            width: 38px; height: 38px; fill: var(--accent-green);
-            cursor: pointer; filter: drop-shadow(0 0 8px rgba(34, 255, 109, 0.6));
-            transition: transform 0.1s;
-            margin-top: -2px;
-        }
+        .middle-label { font-size: 0.8rem; font-weight: 900; color: #666; text-transform: uppercase; }
+        .break-arrow-svg { width: 38px; height: 38px; fill: var(--accent-green); filter: drop-shadow(0 0 8px rgba(34, 255, 109, 0.6)); }
         .flipped { transform: scaleX(-1); }
 
         .mid-select {
-            background: #222; border: 1px solid #444; color: #aaa;
-            padding: 6px 2px; border-radius: 4px;
-            font-family: 'Chakra Petch', sans-serif;
-            font-size: 0.8rem; font-weight: 700; text-transform: uppercase;
-            width: 95%; text-align: center; outline: none;
-            -webkit-appearance: none; appearance: none;
-            cursor: pointer;
+            background: #1a1a1a; border: 1px solid #333; color: #999; padding: 4px 0; border-radius: 4px;
+            font-family: inherit; font-size: 0.85rem; font-weight: 700; width: 90%; 
+            appearance: none; -webkit-appearance: none; text-align: center; text-align-last: center;
         }
 
-        .middle-logo { width: 85%; height: auto; opacity: 0.8; margin-bottom: 5px; }
+        .middle-logo { width: 80%; max-height: 45px; height: auto; opacity: 0.8; object-fit: contain; }
+        .score-num { font-size: clamp(8rem, 32vw, 38rem); font-weight: 700; line-height: 1; text-shadow: 0 0 30px rgba(0,0,0,0.6); }
 
-        .score-num {
-            font-size: clamp(8rem, 32vw, 38rem); 
-            font-weight: 700; line-height: 1;
-            margin: 0; cursor: pointer;
-            text-shadow: 0 0 30px rgba(0,0,0,0.6);
-        }
-
-        body.fullscreen-focus .top-nav, body.fullscreen-focus .names-banner { display: none !important; }
-        #exit-focus { display: none; position: fixed; top: 10px; right: 10px; z-index: 1000; background: rgba(0,0,0,0.7); border: 1px solid var(--border-color); color: #fff; padding: 6px 10px; border-radius: 6px; font-size: 0.7rem; backdrop-filter: blur(4px); }
+        #orientation-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 10000; flex-direction: column; justify-content: center; align-items: center; }
+        @media screen and (orientation: portrait) { #orientation-overlay { display: flex; } .main-wrapper { display: none; } }
+        body.fullscreen-focus .top-nav, body.fullscreen-focus .names-banner { display: none; }
+        #exit-focus { display: none; position: fixed; top: 10px; right: 10px; z-index: 1000; background: rgba(0,0,0,0.7); border: 1px solid var(--border-color); color: #fff; padding: 6px 10px; border-radius: 6px; font-size: 0.7rem; }
         body.fullscreen-focus #exit-focus { display: block; }
     </style>
 </head>
 <body>
-
-    <div id="orientation-overlay">
-        <div style="font-size: 4rem; margin-bottom: 20px;">📱🔄</div>
-        <h2>ROTATE TO LANDSCAPE</h2>
-        <p style="color: #666;">Chalky Trousers Scoreboard requires horizontal view.</p>
-    </div>
-
-    <button id="exit-focus" onpointerdown="event.stopPropagation()" onclick="toggleFS()">✕ Show Controls</button>
-
+    <div id="orientation-overlay"><h2>ROTATE TO LANDSCAPE</h2></div>
+    <button id="exit-focus" onclick="toggleFS()">✕ Show Controls</button>
     <div class="main-wrapper">
         <header class="top-nav">
             <div class="logo-text">WWW.CHALKYTROUSERS.CO.UK</div>
             <div style="display:flex; gap:10px;">
-                <button class="nav-btn" id="fs-btn" onpointerdown="event.stopPropagation()" onclick="toggleFS()">⛶ Fullscreen</button>
-                <button class="nav-btn reset" onpointerdown="event.stopPropagation()" onclick="resetMatch()">Reset</button>
+                <button class="nav-btn" id="fs-btn" style="display:none;" onclick="toggleFS()">⛶ Fullscreen</button>
+                <button class="nav-btn reset" onclick="resetMatch()">Reset</button>
             </div>
         </header>
-
         <nav class="names-banner">
-            <div class="name-slot" onpointerdown="event.stopPropagation()" onclick="changeName('p1-txt')">
-                <span id="p1-txt">PLAYER 1</span>
-            </div>
+            <div class="name-slot" onclick="changeName('p1-txt')"><span id="p1-txt">PLAYER 1</span></div>
             <div class="name-spacer"></div>
-            <div class="name-slot" onpointerdown="event.stopPropagation()" onclick="changeName('p2-txt')">
-                <span id="p2-txt">PLAYER 2</span>
-            </div>
+            <div class="name-slot" onclick="changeName('p2-txt')"><span id="p2-txt">PLAYER 2</span></div>
         </nav>
-
         <main class="scores-area">
-            <section class="score-pane">
-                <div class="score-num" id="s1" 
-                     onpointerdown="scStart(event, 's1')" 
-                     onpointerup="scEnd(event, 's1')"
-                     onpointerleave="scCancel('s1')">0</div>
-            </section>
-
+            <section class="score-pane"><div class="score-num" id="s1" onpointerdown="scStart(event, 's1')" onpointerup="scEnd(event, 's1')">0</div></section>
             <section class="middle-banner">
-                <div class="middle-section">
-                    <div class="middle-label">BREAK</div>
-                    <div id="arrow-wrap" onpointerdown="event.stopPropagation()" onclick="toggleBreak()">
-                        <svg id="svg-arrow" class="break-arrow-svg" viewBox="0 0 24 24">
-                            <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/>
-                        </svg>
-                    </div>
-                </div>
-
-                <div class="middle-section">
-                    <div class="middle-label">RACE TO:</div>
-                    <select id="race-to-select" class="mid-select" onchange="saveToStorage()">
-                        <option value="-">-</option>
-                        <option value="1">1</option><option value="3">3</option><option value="5">5</option>
-                        <option value="7">7</option><option value="9">9</option><option value="11">11</option>
-                        <option value="13">13</option><option value="15">15</option><option value="17">17</option>
-                        <option value="19">19</option><option value="21">21</option>
-                    </select>
-                </div>
-
-                <div class="middle-section">
-                    <div class="middle-label">RULES</div>
-                    <select id="ruleset-select" class="mid-select" onchange="saveToStorage()">
-                        <option value="uk8">uk8</option>
-                        <option value="wpa">wpa</option>
-                        <option value="ultimate">ultimate</option>
-                        <option value="custom">custom</option>
-                    </select>
-                </div>
-
+                <div class="middle-section"><div class="middle-label">BREAK</div><div id="arrow-wrap" onclick="toggleBreak()"><svg id="svg-arrow" class="break-arrow-svg" viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/></svg></div></div>
+                <div class="middle-section"><div class="middle-label">RACE TO</div><select id="race-to-select" class="mid-select" onchange="save()"><option value="-">-</option><option value="1">1</option><option value="3">3</option><option value="5">5</option><option value="7">7</option><option value="9">9</option><option value="11">11</option></select></div>
+                <div class="middle-section"><div class="middle-label">RULES</div><select id="ruleset-select" class="mid-select" onchange="save()"><option value="uk8">uk8</option><option value="wpa">wpa</option><option value="ultimate">ultimate</option><option value="custom">custom</option></select></div>
                 <img id="logo-img" src="https://chalkytrousers.github.io/Chalky-Trousers-App-Test/assets/ct-logo-text.png?v=205" class="middle-logo" alt="Logo">
             </section>
-
-            <section class="score-pane">
-                <div class="score-num" id="s2" 
-                     onpointerdown="scStart(event, 's2')" 
-                     onpointerup="scEnd(event, 's2')"
-                     onpointerleave="scCancel('s2')">0</div>
-            </section>
+            <section class="score-pane"><div class="score-num" id="s2" onpointerdown="scStart(event, 's2')" onpointerup="scEnd(event, 's2')">0</div></section>
         </main>
     </div>
-
     <script>
-        const STORAGE_KEY = 'ct_v8_data';
-
-        function saveToStorage() {
-            const data = {
-                s1: document.getElementById('s1').innerText,
-                s2: document.getElementById('s2').innerText,
-                p1: document.getElementById('p1-txt').innerText,
-                p2: document.getElementById('p2-txt').innerText,
-                side: breakSide,
-                rules: document.getElementById('ruleset-select').value,
-                race: document.getElementById('race-to-select').value
-            };
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-        }
-
-        function loadFromStorage() {
-            const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) {
-                const data = JSON.parse(saved);
-                document.getElementById('s1').innerText = data.s1 || "0";
-                document.getElementById('s2').innerText = data.s2 || "0";
-                document.getElementById('p1-txt').innerText = data.p1 || "PLAYER 1";
-                document.getElementById('p2-txt').innerText = data.p2 || "PLAYER 2";
-                breakSide = data.side || 1;
-                updateArrow();
-                document.getElementById('ruleset-select').value = data.rules || "uk8";
-                document.getElementById('race-to-select').value = data.race || "-";
-            }
-        }
-
-        let breakSide = 1; 
-        function toggleBreak() { breakSide = breakSide === 1 ? 2 : 1; updateArrow(); saveToStorage(); }
-        function updateArrow() { const arrow = document.getElementById('svg-arrow'); if (breakSide === 1) arrow.classList.remove('flipped'); else arrow.classList.add('flipped'); }
-        function changeName(id) { const el = document.getElementById(id); const res = prompt("Enter Name:", el.innerText); if (res !== null && res.trim() !== "") { el.innerText = res.toUpperCase(); saveToStorage(); } }
-
+        const KEY = 'ct_v8_data';
+        function save() { const d = { s1: document.getElementById('s1').innerText, s2: document.getElementById('s2').innerText, p1: document.getElementById('p1-txt').innerText, p2: document.getElementById('p2-txt').innerText, side: breakSide, rules: document.getElementById('ruleset-select').value, race: document.getElementById('race-to-select').value }; localStorage.setItem(KEY, JSON.stringify(d)); }
+        function load() { const s = localStorage.getItem(KEY); if (s) { const d = JSON.parse(s); document.getElementById('s1').innerText = d.s1 || "0"; document.getElementById('s2').innerText = d.s2 || "0"; document.getElementById('p1-txt').innerText = d.p1 || "PLAYER 1"; document.getElementById('p2-txt').innerText = d.p2 || "PLAYER 2"; breakSide = d.side || 1; updateArrow(); document.getElementById('ruleset-select').value = d.rules || "uk8"; document.getElementById('race-to-select').value = d.race || "-"; } }
+        let breakSide = 1; function toggleBreak() { breakSide = breakSide === 1 ? 2 : 1; updateArrow(); save(); }
+        function updateArrow() { const a = document.getElementById('svg-arrow'); if (breakSide === 1) a.classList.remove('flipped'); else a.classList.add('flipped'); }
+        function changeName(id) { const el = document.getElementById(id); const res = prompt("Enter Name:", el.innerText); if (res) { el.innerText = res.toUpperCase(); save(); } }
         let holdT, isHold = false;
-        function scStart(e, id) { e.preventDefault(); document.activeElement.blur(); isHold = false; holdT = setTimeout(() => { isHold = true; update(id, -1); flash(id, '#ff4444'); }, 600); }
-        function scEnd(e, id) { clearTimeout(holdT); if (!isHold) { update(id, 1); flash(id, '#22ff6d'); } }
-        function scCancel(id) { clearTimeout(holdT); }
-        function update(id, n) { const el = document.getElementById(id); let val = parseInt(el.innerText) + n; el.innerText = val < 0 ? 0 : val; saveToStorage(); }
-        function flash(id, color) { const el = document.getElementById(id); const old = el.style.color; el.style.color = color; setTimeout(() => el.style.color = old, 200); }
-
-        function resetMatch() { if (confirm("Reset current match scores?")) { document.getElementById('s1').innerText = "0"; document.getElementById('s2').innerText = "0"; saveToStorage(); } }
-
-        function toggleFS() {
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-            if (isIOS) {
-                document.body.classList.toggle('fullscreen-focus');
-            } else {
-                if (!document.fullscreenElement) {
-                    document.documentElement.requestFullscreen().catch(e => console.log(e));
-                } else {
-                    document.exitFullscreen();
-                }
-            }
-        }
-
-        window.addEventListener('resize', () => { document.getElementById('orientation-overlay').style.display = (window.innerHeight > window.innerWidth) ? 'flex' : 'none'; });
-        window.addEventListener('load', () => {
-            loadFromStorage();
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-            const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
-            
-            // SECURITY: The button is forced visible for Android browser AND Android shortcuts.
-            // It only hides on iOS Home Screen where standard fullscreen is automatic.
-            if (!isIOS || !isStandalone) {
-                document.getElementById('fs-btn').style.display = 'block';
-            }
-        });
-
-        document.addEventListener('touchstart', (e) => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
+        function scStart(e, id) { e.preventDefault(); isHold = false; holdT = setTimeout(() => { isHold = true; upd(id, -1); flash(id, '#ff4444'); }, 600); }
+        function scEnd(e, id) { clearTimeout(holdT); if (!isHold) { upd(id, 1); flash(id, '#22ff6d'); } }
+        function upd(id, n) { const el = document.getElementById(id); let v = parseInt(el.innerText) + n; el.innerText = v < 0 ? 0 : v; save(); }
+        function flash(id, c) { const el = document.getElementById(id); const o = el.style.color; el.style.color = c; setTimeout(() => el.style.color = o, 200); }
+        function resetMatch() { if (confirm("Reset current match scores?")) { document.getElementById('s1').innerText = "0"; document.getElementById('s2').innerText = "0"; save(); } }
+        function toggleFS() { const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); if (isIOS) document.body.classList.toggle('fullscreen-focus'); else { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(e => console.log(e)); else document.exitFullscreen(); } }
+        window.addEventListener('load', () => { load(); const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); const isSA = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches; if (!isIOS || !isSA) document.getElementById('fs-btn').style.display = 'block'; });
         window.oncontextmenu = (e) => { if(e.target.classList.contains('score-num')) e.preventDefault(); };
     </script>
 </body>
