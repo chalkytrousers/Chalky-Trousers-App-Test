@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <link rel="manifest" href="manifest.json?v=41">
+    <link rel="manifest" href="manifest.json?v=42">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#000000">
@@ -18,11 +18,19 @@
             --accent-red-subtle: rgba(255, 68, 68, 0.2);
             --border-color: rgba(255, 255, 255, 0.1);
             --middle-width: clamp(85px, 13vw, 140px);
-            --nav-h: 35px; /* Tighter top banner */
-            --name-h: 50px; /* Taller banner but tighter internal padding */
+            --nav-h: 35px;
+            --name-h: 50px;
         }
 
-        * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; touch-action: none; }
+        * { 
+            box-sizing: border-box; 
+            /* Strict UI Lock for iOS */
+            user-select: none !important; 
+            -webkit-user-select: none !important; 
+            -webkit-touch-callout: none !important; /* Disables the Copy/Lookup menu */
+            -webkit-tap-highlight-color: transparent; 
+            touch-action: none; 
+        }
 
         body, html {
             margin: 0; padding: 0; height: 100%; width: 100vw;
@@ -53,7 +61,7 @@
             text-transform: uppercase; color: #bbb; overflow: hidden; white-space: nowrap;
             line-height: 1;
         }
-        .name-spacer { width: var(--middle-width); background: rgba(0,0,0,0.6); } /* Matches middle-banner bg */
+        .name-spacer { width: var(--middle-width); background: rgba(0,0,0,0.6); }
 
         .scores-area { display: flex; flex: 1; width: 100%; overflow: hidden; }
         .score-pane { flex: 1; display: flex; justify-content: center; align-items: center; }
@@ -66,7 +74,6 @@
             flex-shrink: 0;
         }
 
-        /* Group for centered items */
         .mid-content-group {
             display: flex; flex-direction: column; 
             align-items: center; justify-content: center; 
@@ -89,7 +96,15 @@
             margin-top: auto; padding-bottom: 10px;
         }
         
-        .score-num { font-size: clamp(7rem, 28vw, 33rem); font-weight: 700; line-height: 0.85; text-shadow: 0 0 30px rgba(0,0,0,0.6); }
+        .score-num { 
+            font-size: clamp(7rem, 28vw, 33rem); 
+            font-weight: 700; line-height: 0.85; 
+            text-shadow: 0 0 30px rgba(0,0,0,0.6); 
+            cursor: pointer;
+            /* Extra selection prevention for iOS */
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+        }
 
         #orientation-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 10000; flex-direction: column; justify-content: center; align-items: center; }
         @media screen and (orientation: portrait) { #orientation-overlay { display: flex; } .main-wrapper { display: none; } }
@@ -115,7 +130,7 @@
             <div class="name-slot" onclick="changeName('p2-txt')"><span id="p2-txt">PLAYER 2</span></div>
         </nav>
         <main class="scores-area">
-            <section class="score-pane"><div class="score-num" id="s1" onpointerdown="scStart(event, 's1')" onpointerup="scEnd(event, 's1')">0</div></section>
+            <section class="score-pane"><div class="score-num" id="s1" onpointerdown="scStart(event, 's1')" onpointerup="scEnd(event, 's1')" onpointerleave="scCancel('s1')">0</div></section>
             
             <section class="middle-banner">
                 <div class="middle-section">
@@ -144,25 +159,63 @@
                 <img id="logo-img" src="https://chalkytrousers.github.io/Chalky-Trousers-App-Test/assets/ct-logo-text.png?v=205" class="middle-logo" alt="Logo">
             </section>
 
-            <section class="score-pane"><div class="score-num" id="s2" onpointerdown="scStart(event, 's2')" onpointerup="scEnd(event, 's2')">0</div></section>
+            <section class="score-pane"><div class="score-num" id="s2" onpointerdown="scStart(event, 's2')" onpointerup="scEnd(event, 's2')" onpointerleave="scCancel('s2')">0</div></section>
         </main>
     </div>
     <script>
         const KEY = 'ct_v8_data';
         function save() { const d = { s1: document.getElementById('s1').innerText, s2: document.getElementById('s2').innerText, p1: document.getElementById('p1-txt').innerText, p2: document.getElementById('p2-txt').innerText, side: breakSide, rules: document.getElementById('ruleset-select').value, race: document.getElementById('race-to-select').value }; localStorage.setItem(KEY, JSON.stringify(d)); }
         function load() { const s = localStorage.getItem(KEY); if (s) { const d = JSON.parse(s); document.getElementById('s1').innerText = d.s1 || "0"; document.getElementById('s2').innerText = d.s2 || "0"; document.getElementById('p1-txt').innerText = d.p1 || "PLAYER 1"; document.getElementById('p2-txt').innerText = d.p2 || "PLAYER 2"; breakSide = d.side || 1; updateArrow(); document.getElementById('ruleset-select').value = d.rules || "uk8"; document.getElementById('race-to-select').value = d.race || "-"; } }
-        let breakSide = 1; function toggleBreak() { breakSide = breakSide === 1 ? 2 : 1; updateArrow(); save(); }
+        
+        let breakSide = 1; 
+        function toggleBreak() { breakSide = breakSide === 1 ? 2 : 1; updateArrow(); save(); }
         function updateArrow() { const a = document.getElementById('svg-arrow'); if (breakSide === 1) a.classList.remove('flipped'); else a.classList.add('flipped'); }
         function changeName(id) { const el = document.getElementById(id); const res = prompt("Enter Name:", el.innerText); if (res) { el.innerText = res.toUpperCase(); save(); } }
+        
         let holdT, isHold = false;
-        function scStart(e, id) { e.preventDefault(); isHold = false; holdT = setTimeout(() => { isHold = true; upd(id, -1); flash(id, '#ff4444'); }, 600); }
-        function scEnd(e, id) { clearTimeout(holdT); if (!isHold) { upd(id, 1); flash(id, '#22ff6d'); } }
+
+        function scStart(e, id) { 
+            // VITAL: preventDefault kills the system selection menu
+            if (e.cancelable) e.preventDefault(); 
+            isHold = false; 
+            holdT = setTimeout(() => { 
+                isHold = true; 
+                upd(id, -1); 
+                flash(id, '#ff4444'); 
+            }, 600); 
+        }
+
+        function scEnd(e, id) { 
+            clearTimeout(holdT); 
+            if (!isHold) { 
+                upd(id, 1); 
+                flash(id, '#22ff6d'); 
+            } 
+        }
+
+        function scCancel(id) { clearTimeout(holdT); }
+
         function upd(id, n) { const el = document.getElementById(id); let v = parseInt(el.innerText) + n; el.innerText = v < 0 ? 0 : v; save(); }
         function flash(id, c) { const el = document.getElementById(id); const o = el.style.color; el.style.color = c; setTimeout(() => el.style.color = o, 200); }
+        
         function resetMatch() { if (confirm("Reset scores?")) { document.getElementById('s1').innerText = "0"; document.getElementById('s2').innerText = "0"; save(); } }
+        
         function toggleFS() { const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); if (isIOS) document.body.classList.toggle('fullscreen-focus'); else { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); } }
-        window.addEventListener('load', () => { load(); const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); const isSA = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches; if (!isIOS || !isSA) document.getElementById('fs-btn').style.display = 'block'; });
-        window.oncontextmenu = (e) => { if(e.target.classList.contains('score-num')) e.preventDefault(); };
+        
+        window.addEventListener('load', () => { 
+            load(); 
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); 
+            const isSA = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches; 
+            if (!isIOS || !isSA) document.getElementById('fs-btn').style.display = 'block'; 
+        });
+
+        // Block context menu specifically on scores
+        window.oncontextmenu = (e) => { 
+            if(e.target.classList.contains('score-num')) {
+                e.preventDefault(); 
+                return false;
+            }
+        };
     </script>
 </body>
 </html>
