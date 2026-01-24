@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <link rel="manifest" href="manifest.json?v=39">
+    <link rel="manifest" href="manifest.json?v=40">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#000000">
@@ -18,8 +18,8 @@
             --accent-red-subtle: rgba(255, 68, 68, 0.2);
             --border-color: rgba(255, 255, 255, 0.1);
             --middle-width: clamp(85px, 13vw, 140px);
-            --nav-h: 45px;
-            --name-h: 65px;
+            --nav-h: 38px; /* Slightly reduced height */
+            --name-h: 55px; /* Slightly reduced height */
         }
 
         * { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; touch-action: none; }
@@ -33,23 +33,25 @@
         .main-wrapper {
             display: flex; flex-direction: column; height: 100dvh; width: 100%;
             background-image: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
-            /* Expanded Safe Zones for TV Overscan */
-            padding: 2vh 3vw; 
+            padding: 1.5vh 3vw; /* Balanced safe zone */
         }
 
         .top-nav {
             display: flex; justify-content: space-between; align-items: center;
             padding: 0 10px; height: var(--nav-h);
             border-bottom: 1px solid var(--border-color); flex-shrink: 0;
-            margin-bottom: 5px;
         }
 
-        .logo-text { font-size: 0.7rem; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; }
-        .nav-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #888; padding: 4px 10px; border-radius: 4px; font-size: 0.7rem; }
+        .logo-text { font-size: 0.65rem; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; }
+        .nav-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #888; padding: 3px 8px; border-radius: 4px; font-size: 0.65rem; }
         .nav-btn.reset { background: var(--accent-red-subtle); border: 1px solid rgba(255, 68, 68, 0.3); color: white; }
 
         .names-banner { display: flex; height: var(--name-h); background: var(--banner-bg); border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
-        .name-slot { flex: 1; display: flex; justify-content: center; align-items: center; font-size: clamp(1.8rem, 4vw, 3.2rem); font-weight: 900; text-transform: uppercase; color: #bbb; overflow: hidden; white-space: nowrap; }
+        .name-slot { 
+            flex: 1; display: flex; justify-content: center; align-items: center; 
+            font-size: clamp(1.6rem, 3.8vw, 3rem); font-weight: 900; 
+            text-transform: uppercase; color: #bbb; overflow: hidden; white-space: nowrap; 
+        }
         .name-spacer { width: var(--middle-width); }
 
         .scores-area { display: flex; flex: 1; width: 100%; overflow: hidden; }
@@ -58,26 +60,30 @@
         .middle-banner {
             width: var(--middle-width); display: flex; flex-direction: column;
             align-items: center; justify-content: center; 
-            gap: 1.5vh; /* Uniform spacing */
-            padding: 5px; background: rgba(0,0,0,0.4);
+            gap: 1.2vh; /* Slightly tighter gap */
+            padding: 5px; background: rgba(0,0,0,0.5); /* Darker for contrast */
             border-left: 1px solid var(--border-color); border-right: 1px solid var(--border-color);
-            /* Force middle content to stay within a center safe zone */
-            max-height: 80%; margin: auto 0;
+            max-height: 85%; margin: auto 0;
+            position: relative; /* Anchor for alignment */
         }
 
         .middle-section { text-align: center; width: 100%; }
-        .middle-label { font-size: 0.75rem; font-weight: 900; color: #555; text-transform: uppercase; margin-bottom: 2px; }
+        .middle-label { font-size: 0.7rem; font-weight: 900; color: #555; text-transform: uppercase; margin-bottom: 1px; }
         .break-arrow-svg { width: 34px; height: 34px; fill: var(--accent-green); filter: drop-shadow(0 0 8px rgba(34, 255, 109, 0.6)); }
         .flipped { transform: scaleX(-1); }
 
         .mid-select {
-            background: #1a1a1a; border: 1px solid #333; color: #999; padding: 3px 0; border-radius: 4px;
-            font-family: inherit; font-size: 0.8rem; font-weight: 700; width: 92%; 
+            background: #1a1a1a; border: 1px solid #333; color: #999; padding: 2px 0; border-radius: 4px;
+            font-family: inherit; font-size: 0.75rem; font-weight: 700; width: 92%; 
             appearance: none; -webkit-appearance: none; text-align: center; text-align-last: center;
         }
 
-        .middle-logo { width: 85%; max-height: 35px; height: auto; opacity: 0.7; object-fit: contain; }
-        .score-num { font-size: clamp(8rem, 30vw, 35rem); font-weight: 700; line-height: 0.9; text-shadow: 0 0 30px rgba(0,0,0,0.6); }
+        .middle-logo { 
+            width: 85%; max-height: 32px; height: auto; opacity: 0.7; object-fit: contain; 
+            margin-bottom: 10px; /* Increased bottom padding */
+        }
+        
+        .score-num { font-size: clamp(7rem, 28vw, 33rem); font-weight: 700; line-height: 0.85; text-shadow: 0 0 30px rgba(0,0,0,0.6); }
 
         #orientation-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 10000; flex-direction: column; justify-content: center; align-items: center; }
         @media screen and (orientation: portrait) { #orientation-overlay { display: flex; } .main-wrapper { display: none; } }
@@ -105,9 +111,25 @@
         <main class="scores-area">
             <section class="score-pane"><div class="score-num" id="s1" onpointerdown="scStart(event, 's1')" onpointerup="scEnd(event, 's1')">0</div></section>
             <section class="middle-banner">
-                <div class="middle-section"><div class="middle-label">BREAK</div><div id="arrow-wrap" onclick="toggleBreak()"><svg id="svg-arrow" class="break-arrow-svg" viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/></svg></div></div>
-                <div class="middle-section"><div class="middle-label">RACE TO</div><select id="race-to-select" class="mid-select" onchange="save()"><option value="-">-</option><option value="1">1</option><option value="3">3</option><option value="5">5</option><option value="7">7</option><option value="9">9</option><option value="11">11</option></select></div>
-                <div class="middle-section"><div class="middle-label">RULES</div><select id="ruleset-select" class="mid-select" onchange="save()"><option value="uk8">uk8</option><option value="wpa">wpa</option><option value="ultimate">ultimate</option><option value="custom">custom</option></select></div>
+                <div class="middle-section">
+                    <div class="middle-label">BREAK</div>
+                    <div id="arrow-wrap" onclick="toggleBreak()">
+                        <svg id="svg-arrow" class="break-arrow-svg" viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/></svg>
+                    </div>
+                </div>
+                <div class="middle-section">
+                    <div class="middle-label">RACE TO</div>
+                    <select id="race-to-select" class="mid-select" onchange="save()">
+                        <option value="-">-</option><option value="1">1</option><option value="3">3</option>
+                        <option value="5">5</option><option value="7">7</option><option value="9">9</option><option value="11">11</option>
+                    </select>
+                </div>
+                <div class="middle-section">
+                    <div class="middle-label">RULES</div>
+                    <select id="ruleset-select" class="mid-select" onchange="save()">
+                        <option value="uk8">uk8</option><option value="wpa">wpa</option><option value="ultimate">ultimate</option><option value="custom">custom</option>
+                    </select>
+                </div>
                 <img id="logo-img" src="https://chalkytrousers.github.io/Chalky-Trousers-App-Test/assets/ct-logo-text.png?v=205" class="middle-logo" alt="Logo">
             </section>
             <section class="score-pane"><div class="score-num" id="s2" onpointerdown="scStart(event, 's2')" onpointerup="scEnd(event, 's2')">0</div></section>
@@ -125,8 +147,8 @@
         function scEnd(e, id) { clearTimeout(holdT); if (!isHold) { upd(id, 1); flash(id, '#22ff6d'); } }
         function upd(id, n) { const el = document.getElementById(id); let v = parseInt(el.innerText) + n; el.innerText = v < 0 ? 0 : v; save(); }
         function flash(id, c) { const el = document.getElementById(id); const o = el.style.color; el.style.color = c; setTimeout(() => el.style.color = o, 200); }
-        function resetMatch() { if (confirm("Reset current match scores?")) { document.getElementById('s1').innerText = "0"; document.getElementById('s2').innerText = "0"; save(); } }
-        function toggleFS() { const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); if (isIOS) document.body.classList.toggle('fullscreen-focus'); else { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(e => console.log(e)); else document.exitFullscreen(); } }
+        function resetMatch() { if (confirm("Reset scores?")) { document.getElementById('s1').innerText = "0"; document.getElementById('s2').innerText = "0"; save(); } }
+        function toggleFS() { const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); if (isIOS) document.body.classList.toggle('fullscreen-focus'); else { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); } }
         window.addEventListener('load', () => { load(); const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); const isSA = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches; if (!isIOS || !isSA) document.getElementById('fs-btn').style.display = 'block'; });
         window.oncontextmenu = (e) => { if(e.target.classList.contains('score-num')) e.preventDefault(); };
     </script>
