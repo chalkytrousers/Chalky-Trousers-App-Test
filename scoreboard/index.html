@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <link rel="manifest" href="manifest.json?v=42">
+    <link rel="manifest" href="manifest.json?v=45">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#000000">
@@ -18,16 +18,32 @@
             --accent-red-subtle: rgba(255, 68, 68, 0.2);
             --border-color: rgba(255, 255, 255, 0.1);
             --middle-width: clamp(85px, 13vw, 140px);
-            --nav-h: 35px;
-            --name-h: 50px;
+            --nav-h: 32px;
+            --name-h: 44px;
+            --mid-gap: 1.2vh;
+            --label-fs: 0.65rem;
+            --logo-mh: 32px; /* Safe Mode height */
+            --logo-w: 85%;   /* Safe Mode width */
+        }
+
+        /* THE SHAPE DETECTOR: Scaling up for Tall Devices (Samsung/Android) */
+        @media screen and (min-aspect-ratio: 21/10) {
+            :root {
+                --middle-width: 160px; 
+                --name-h: 65px;       
+                --mid-gap: 2.5vh;     
+                --label-fs: 0.85rem;  
+                --logo-mh: 60px;     /* Much taller on Android */
+                --logo-w: 95%;       /* Fills the pillar width-ways */
+            }
+            .score-num { font-size: clamp(8rem, 30vw, 38rem) !important; }
         }
 
         * { 
             box-sizing: border-box; 
-            /* Strict UI Lock for iOS */
             user-select: none !important; 
             -webkit-user-select: none !important; 
-            -webkit-touch-callout: none !important; /* Disables the Copy/Lookup menu */
+            -webkit-touch-callout: none !important; 
             -webkit-tap-highlight-color: transparent; 
             touch-action: none; 
         }
@@ -41,7 +57,7 @@
         .main-wrapper {
             display: flex; flex-direction: column; height: 100dvh; width: 100%;
             background-image: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
-            padding: 1vh 3vw; 
+            padding: 0.5vh 3vw; 
         }
 
         .top-nav {
@@ -51,17 +67,17 @@
         }
 
         .logo-text { font-size: 0.65rem; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; }
-        .nav-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #888; padding: 2px 8px; border-radius: 4px; font-size: 0.6rem; }
+        .nav-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #888; padding: 1px 8px; border-radius: 4px; font-size: 0.6rem; }
         .nav-btn.reset { background: var(--accent-red-subtle); border: 1px solid rgba(255, 68, 68, 0.3); color: white; }
 
-        .names-banner { display: flex; height: var(--name-h); background: var(--banner-bg); border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
+        .names-banner { display: flex; height: var(--name-h); background: var(--banner-bg); border-bottom: 1px solid var(--border-color); flex-shrink: 0; transition: height 0.3s; }
         .name-slot { 
             flex: 1; display: flex; justify-content: center; align-items: center; 
-            font-size: clamp(1.6rem, 3.8vw, 3rem); font-weight: 900; 
+            font-size: clamp(1.6rem, 3.8vw, 3.2rem); font-weight: 900; 
             text-transform: uppercase; color: #bbb; overflow: hidden; white-space: nowrap;
             line-height: 1;
         }
-        .name-spacer { width: var(--middle-width); background: rgba(0,0,0,0.6); }
+        .name-spacer { width: var(--middle-width); background: rgba(0,0,0,0.6); transition: width 0.3s; }
 
         .scores-area { display: flex; flex: 1; width: 100%; overflow: hidden; }
         .score-pane { flex: 1; display: flex; justify-content: center; align-items: center; }
@@ -69,41 +85,43 @@
         .middle-banner {
             width: var(--middle-width); display: flex; flex-direction: column;
             align-items: center; justify-content: space-between; 
-            padding: 10px 5px; background: rgba(0,0,0,0.6); 
+            padding: 8px 5px; background: rgba(0,0,0,0.6); 
             border-left: 1px solid var(--border-color); border-right: 1px solid var(--border-color);
-            flex-shrink: 0;
+            flex-shrink: 0; transition: width 0.3s;
         }
 
         .mid-content-group {
             display: flex; flex-direction: column; 
             align-items: center; justify-content: center; 
-            gap: 1.5vh; flex: 1; width: 100%;
+            gap: var(--mid-gap); flex: 1; width: 100%;
         }
 
         .middle-section { text-align: center; width: 100%; }
-        .middle-label { font-size: 0.7rem; font-weight: 900; color: #555; text-transform: uppercase; margin-bottom: 1px; }
+        .middle-label { font-size: var(--label-fs); font-weight: 900; color: #444; text-transform: uppercase; margin-bottom: 1px; transition: font-size 0.3s; }
         .break-arrow-svg { width: 34px; height: 34px; fill: var(--accent-green); filter: drop-shadow(0 0 8px rgba(34, 255, 109, 0.6)); }
         .flipped { transform: scaleX(-1); }
 
         .mid-select {
-            background: #1a1a1a; border: 1px solid #333; color: #999; padding: 3px 0; border-radius: 4px;
+            background: #1a1a1a; border: 1px solid #333; color: #999; padding: 2px 0; border-radius: 4px;
             font-family: inherit; font-size: 0.75rem; font-weight: 700; width: 92%; 
             appearance: none; -webkit-appearance: none; text-align: center; text-align-last: center;
         }
 
         .middle-logo { 
-            width: 85%; max-height: 32px; height: auto; opacity: 0.7; object-fit: contain; 
-            margin-top: auto; padding-bottom: 10px;
+            width: var(--logo-w); 
+            max-height: var(--logo-mh); 
+            height: auto; 
+            opacity: 0.7; 
+            object-fit: contain; 
+            margin-top: auto; 
+            padding-bottom: 10px; 
+            transition: all 0.3s;
         }
         
         .score-num { 
-            font-size: clamp(7rem, 28vw, 33rem); 
-            font-weight: 700; line-height: 0.85; 
-            text-shadow: 0 0 30px rgba(0,0,0,0.6); 
-            cursor: pointer;
-            /* Extra selection prevention for iOS */
-            -webkit-user-select: none;
-            -webkit-touch-callout: none;
+            font-size: clamp(7rem, 28vw, 33rem); font-weight: 700; line-height: 0.8; 
+            text-shadow: 0 0 30px rgba(0,0,0,0.6); cursor: pointer;
+            -webkit-user-select: none; -webkit-touch-callout: none;
         }
 
         #orientation-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 10000; flex-direction: column; justify-content: center; align-items: center; }
@@ -173,49 +191,15 @@
         function changeName(id) { const el = document.getElementById(id); const res = prompt("Enter Name:", el.innerText); if (res) { el.innerText = res.toUpperCase(); save(); } }
         
         let holdT, isHold = false;
-
-        function scStart(e, id) { 
-            // VITAL: preventDefault kills the system selection menu
-            if (e.cancelable) e.preventDefault(); 
-            isHold = false; 
-            holdT = setTimeout(() => { 
-                isHold = true; 
-                upd(id, -1); 
-                flash(id, '#ff4444'); 
-            }, 600); 
-        }
-
-        function scEnd(e, id) { 
-            clearTimeout(holdT); 
-            if (!isHold) { 
-                upd(id, 1); 
-                flash(id, '#22ff6d'); 
-            } 
-        }
-
+        function scStart(e, id) { if (e.cancelable) e.preventDefault(); isHold = false; holdT = setTimeout(() => { isHold = true; upd(id, -1); flash(id, '#ff4444'); }, 600); }
+        function scEnd(e, id) { clearTimeout(holdT); if (!isHold) { upd(id, 1); flash(id, '#22ff6d'); } }
         function scCancel(id) { clearTimeout(holdT); }
-
         function upd(id, n) { const el = document.getElementById(id); let v = parseInt(el.innerText) + n; el.innerText = v < 0 ? 0 : v; save(); }
         function flash(id, c) { const el = document.getElementById(id); const o = el.style.color; el.style.color = c; setTimeout(() => el.style.color = o, 200); }
-        
-        function resetMatch() { if (confirm("Reset scores?")) { document.getElementById('s1').innerText = "0"; document.getElementById('s2').innerText = "0"; save(); } }
-        
+        function resetMatch() { if (confirm("Reset current match scores?")) { document.getElementById('s1').innerText = "0"; document.getElementById('s2').innerText = "0"; save(); } }
         function toggleFS() { const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); if (isIOS) document.body.classList.toggle('fullscreen-focus'); else { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); } }
-        
-        window.addEventListener('load', () => { 
-            load(); 
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); 
-            const isSA = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches; 
-            if (!isIOS || !isSA) document.getElementById('fs-btn').style.display = 'block'; 
-        });
-
-        // Block context menu specifically on scores
-        window.oncontextmenu = (e) => { 
-            if(e.target.classList.contains('score-num')) {
-                e.preventDefault(); 
-                return false;
-            }
-        };
+        window.addEventListener('load', () => { load(); const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); const isSA = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches; if (!isIOS || !isSA) document.getElementById('fs-btn').style.display = 'block'; });
+        window.oncontextmenu = (e) => { if(e.target.classList.contains('score-num')) { e.preventDefault(); return false; } };
     </script>
 </body>
 </html>
