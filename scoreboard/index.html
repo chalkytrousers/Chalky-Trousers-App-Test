@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <link rel="manifest" href="manifest.json?v=45">
+    <link rel="manifest" href="manifest.json?v=46">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#000000">
@@ -22,21 +22,20 @@
             --name-h: 44px;
             --mid-gap: 1.2vh;
             --label-fs: 0.65rem;
-            --logo-mh: 32px; /* Safe Mode height */
-            --logo-w: 85%;   /* Safe Mode width */
+            --logo-mh: 30px;
+            --logo-pb: 12px; /* Bottom padding for TV/iOS safety */
         }
 
-        /* THE SHAPE DETECTOR: Scaling up for Tall Devices (Samsung/Android) */
+        /* TALL DEVICE SCALING (Samsung/Modern Android) */
         @media screen and (min-aspect-ratio: 21/10) {
             :root {
                 --middle-width: 160px; 
-                --name-h: 65px;       
-                --mid-gap: 2.5vh;     
+                --name-h: 60px;       
+                --mid-gap: 2vh;     
                 --label-fs: 0.85rem;  
-                --logo-mh: 60px;     /* Much taller on Android */
-                --logo-w: 95%;       /* Fills the pillar width-ways */
+                --logo-mh: 55px;
+                --logo-pb: 20px;
             }
-            .score-num { font-size: clamp(8rem, 30vw, 38rem) !important; }
         }
 
         * { 
@@ -57,7 +56,7 @@
         .main-wrapper {
             display: flex; flex-direction: column; height: 100dvh; width: 100%;
             background-image: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
-            padding: 0.5vh 3vw; 
+            padding: 0 3vw; 
         }
 
         .top-nav {
@@ -70,52 +69,64 @@
         .nav-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #888; padding: 1px 8px; border-radius: 4px; font-size: 0.6rem; }
         .nav-btn.reset { background: var(--accent-red-subtle); border: 1px solid rgba(255, 68, 68, 0.3); color: white; }
 
-        .names-banner { display: flex; height: var(--name-h); background: var(--banner-bg); border-bottom: 1px solid var(--border-color); flex-shrink: 0; transition: height 0.3s; }
+        .names-banner { display: flex; height: var(--name-h); background: var(--banner-bg); border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
         .name-slot { 
             flex: 1; display: flex; justify-content: center; align-items: center; 
             font-size: clamp(1.6rem, 3.8vw, 3.2rem); font-weight: 900; 
             text-transform: uppercase; color: #bbb; overflow: hidden; white-space: nowrap;
-            line-height: 1;
         }
-        .name-spacer { width: var(--middle-width); background: rgba(0,0,0,0.6); transition: width 0.3s; }
+        .name-spacer { width: var(--middle-width); background: rgba(0,0,0,0.6); }
 
         .scores-area { display: flex; flex: 1; width: 100%; overflow: hidden; }
         .score-pane { flex: 1; display: flex; justify-content: center; align-items: center; }
 
+        /* THE CENTRAL PILLAR */
         .middle-banner {
-            width: var(--middle-width); display: flex; flex-direction: column;
-            align-items: center; justify-content: space-between; 
-            padding: 8px 5px; background: rgba(0,0,0,0.6); 
-            border-left: 1px solid var(--border-color); border-right: 1px solid var(--border-color);
-            flex-shrink: 0; transition: width 0.3s;
+            width: var(--middle-width); 
+            display: flex; flex-direction: column;
+            background: rgba(0,0,0,0.6); 
+            border-left: 1px solid var(--border-color); 
+            border-right: 1px solid var(--border-color);
+            flex-shrink: 0;
+            padding: 10px 0;
         }
 
-        .mid-content-group {
+        /* THREE BOX CONTAINERS */
+        .mid-box-top {
+            padding: 5px 0;
+            text-align: center;
+        }
+
+        .mid-box-center {
             display: flex; flex-direction: column; 
             align-items: center; justify-content: center; 
-            gap: var(--mid-gap); flex: 1; width: 100%;
+            gap: var(--mid-gap);
+            flex: 1; /* This takes up all available space between top and bottom */
+        }
+
+        .mid-box-bottom {
+            padding-bottom: var(--logo-pb);
+            text-align: center;
         }
 
         .middle-section { text-align: center; width: 100%; }
-        .middle-label { font-size: var(--label-fs); font-weight: 900; color: #444; text-transform: uppercase; margin-bottom: 1px; transition: font-size 0.3s; }
-        .break-arrow-svg { width: 34px; height: 34px; fill: var(--accent-green); filter: drop-shadow(0 0 8px rgba(34, 255, 109, 0.6)); }
+        .middle-label { font-size: var(--label-fs); font-weight: 900; color: #444; text-transform: uppercase; margin-bottom: 1px; }
+        
+        .break-arrow-svg { 
+            width: 36px; height: 36px; fill: var(--accent-green); 
+            filter: drop-shadow(0 0 8px rgba(34, 255, 109, 0.6)); 
+        }
         .flipped { transform: scaleX(-1); }
 
         .mid-select {
             background: #1a1a1a; border: 1px solid #333; color: #999; padding: 2px 0; border-radius: 4px;
-            font-family: inherit; font-size: 0.75rem; font-weight: 700; width: 92%; 
+            font-family: inherit; font-size: 0.75rem; font-weight: 700; width: 90%; 
             appearance: none; -webkit-appearance: none; text-align: center; text-align-last: center;
         }
 
         .middle-logo { 
-            width: var(--logo-w); 
-            max-height: var(--logo-mh); 
-            height: auto; 
-            opacity: 0.7; 
-            object-fit: contain; 
-            margin-top: auto; 
-            padding-bottom: 10px; 
-            transition: all 0.3s;
+            width: 85%; max-height: var(--logo-mh); height: auto; 
+            opacity: 0.7; object-fit: contain; 
         }
         
         .score-num { 
@@ -127,13 +138,14 @@
         #orientation-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 10000; flex-direction: column; justify-content: center; align-items: center; }
         @media screen and (orientation: portrait) { #orientation-overlay { display: flex; } .main-wrapper { display: none; } }
         body.fullscreen-focus .top-nav, body.fullscreen-focus .names-banner { display: none; }
-        #exit-focus { display: none; position: fixed; top: 15px; right: 15px; z-index: 1000; background: rgba(0,0,0,0.8); border: 1px solid var(--border-color); color: #fff; padding: 8px 12px; border-radius: 6px; font-size: 0.7rem; }
+        #exit-focus { display: none; position: fixed; top: 10px; right: 10px; z-index: 1000; background: rgba(0,0,0,0.8); border: 1px solid var(--border-color); color: #fff; padding: 8px 12px; border-radius: 6px; font-size: 0.7rem; }
         body.fullscreen-focus #exit-focus { display: block; }
     </style>
 </head>
 <body>
     <div id="orientation-overlay"><h2>ROTATE TO LANDSCAPE</h2></div>
     <button id="exit-focus" onclick="toggleFS()">✕ Show Controls</button>
+    
     <div class="main-wrapper">
         <header class="top-nav">
             <div class="logo-text">WWW.CHALKYTROUSERS.CO.UK</div>
@@ -142,23 +154,25 @@
                 <button class="nav-btn reset" onclick="resetMatch()">Reset</button>
             </div>
         </header>
+
         <nav class="names-banner">
             <div class="name-slot" onclick="changeName('p1-txt')"><span id="p1-txt">PLAYER 1</span></div>
             <div class="name-spacer"></div>
             <div class="name-slot" onclick="changeName('p2-txt')"><span id="p2-txt">PLAYER 2</span></div>
         </nav>
+
         <main class="scores-area">
             <section class="score-pane"><div class="score-num" id="s1" onpointerdown="scStart(event, 's1')" onpointerup="scEnd(event, 's1')" onpointerleave="scCancel('s1')">0</div></section>
             
             <section class="middle-banner">
-                <div class="middle-section">
+                <div class="mid-box-top">
                     <div class="middle-label">BREAK</div>
                     <div id="arrow-wrap" onclick="toggleBreak()">
                         <svg id="svg-arrow" class="break-arrow-svg" viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/></svg>
                     </div>
                 </div>
 
-                <div class="mid-content-group">
+                <div class="mid-box-center">
                     <div class="middle-section">
                         <div class="middle-label">RACE TO</div>
                         <select id="race-to-select" class="mid-select" onchange="save()">
@@ -174,12 +188,15 @@
                     </div>
                 </div>
 
-                <img id="logo-img" src="https://chalkytrousers.github.io/Chalky-Trousers-App-Test/assets/ct-logo-text.png?v=205" class="middle-logo" alt="Logo">
+                <div class="mid-box-bottom">
+                    <img id="logo-img" src="https://chalkytrousers.github.io/Chalky-Trousers-App-Test/assets/ct-logo-text.png?v=205" class="middle-logo" alt="Logo">
+                </div>
             </section>
 
             <section class="score-pane"><div class="score-num" id="s2" onpointerdown="scStart(event, 's2')" onpointerup="scEnd(event, 's2')" onpointerleave="scCancel('s2')">0</div></section>
         </main>
     </div>
+
     <script>
         const KEY = 'ct_v8_data';
         function save() { const d = { s1: document.getElementById('s1').innerText, s2: document.getElementById('s2').innerText, p1: document.getElementById('p1-txt').innerText, p2: document.getElementById('p2-txt').innerText, side: breakSide, rules: document.getElementById('ruleset-select').value, race: document.getElementById('race-to-select').value }; localStorage.setItem(KEY, JSON.stringify(d)); }
@@ -196,7 +213,7 @@
         function scCancel(id) { clearTimeout(holdT); }
         function upd(id, n) { const el = document.getElementById(id); let v = parseInt(el.innerText) + n; el.innerText = v < 0 ? 0 : v; save(); }
         function flash(id, c) { const el = document.getElementById(id); const o = el.style.color; el.style.color = c; setTimeout(() => el.style.color = o, 200); }
-        function resetMatch() { if (confirm("Reset current match scores?")) { document.getElementById('s1').innerText = "0"; document.getElementById('s2').innerText = "0"; save(); } }
+        function resetMatch() { if (confirm("Reset match?")) { document.getElementById('s1').innerText = "0"; document.getElementById('s2').innerText = "0"; save(); } }
         function toggleFS() { const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); if (isIOS) document.body.classList.toggle('fullscreen-focus'); else { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); } }
         window.addEventListener('load', () => { load(); const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); const isSA = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches; if (!isIOS || !isSA) document.getElementById('fs-btn').style.display = 'block'; });
         window.oncontextmenu = (e) => { if(e.target.classList.contains('score-num')) { e.preventDefault(); return false; } };
