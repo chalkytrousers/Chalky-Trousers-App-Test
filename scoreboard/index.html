@@ -41,7 +41,7 @@
             -webkit-user-select: none !important; 
             -webkit-touch-callout: none !important; 
             -webkit-tap-highlight-color: transparent; 
-            touch-action: pan-y; /* Changed from none to allow some interaction */
+            touch-action: pan-y;
         }
 
         body, html {
@@ -75,8 +75,9 @@
         .name-slot { 
             flex: 1; display: flex; justify-content: center; align-items: center; 
             font-size: clamp(1.2rem, 3.8vw, 3.2rem); font-weight: 900; 
-            text-transform: uppercase; color: #bbb; overflow: hidden; white-space: nowrap;
-            outline: none; /* Removes focus ring when editing */
+            text-transform: uppercase; /* HANDLES UPPERCASE VISUALLY WITHOUT JS INTERFERENCE */
+            color: #bbb; overflow: hidden; white-space: nowrap;
+            outline: none;
         }
         .name-slot:focus { color: var(--accent-green); background: rgba(255,255,255,0.05); }
 
@@ -146,9 +147,9 @@
         </header>
 
         <nav class="names-banner">
-            <div class="name-slot" id="p1-txt" contenteditable="true" spellcheck="false" oninput="limitName(this)" onblur="save()">PLAYER 1</div>
+            <div class="name-slot" id="p1-txt" contenteditable="true" spellcheck="false" oninput="limitName(this)">PLAYER 1</div>
             <div class="name-spacer"></div>
-            <div class="name-slot" id="p2-txt" contenteditable="true" spellcheck="false" oninput="limitName(this)" onblur="save()">PLAYER 2</div>
+            <div class="name-slot" id="p2-txt" contenteditable="true" spellcheck="false" oninput="limitName(this)">PLAYER 2</div>
         </nav>
 
         <main class="scores-area">
@@ -204,8 +205,8 @@
             const d = {
                 s1: document.getElementById('s1').innerText,
                 s2: document.getElementById('s2').innerText,
-                p1: document.getElementById('p1-txt').innerText,
-                p2: document.getElementById('p2-txt').innerText,
+                p1: document.getElementById('p1-txt').innerText.trim(),
+                p2: document.getElementById('p2-txt').innerText.trim(),
                 side: breakSide,
                 rules: document.getElementById('ruleset-select').value,
                 race: document.getElementById('race-to-select').value
@@ -219,8 +220,8 @@
                 const d = JSON.parse(s);
                 document.getElementById('s1').innerText = d.s1 || "0";
                 document.getElementById('s2').innerText = d.s2 || "0";
-                document.getElementById('p1-txt').innerText = (d.p1 || "PLAYER 1").toUpperCase();
-                document.getElementById('p2-txt').innerText = (d.p2 || "PLAYER 2").toUpperCase();
+                document.getElementById('p1-txt').innerText = d.p1 || "PLAYER 1";
+                document.getElementById('p2-txt').innerText = d.p2 || "PLAYER 2";
                 breakSide = d.side || 1;
                 updateArrow();
                 document.getElementById('ruleset-select').value = d.rules || "uk8";
@@ -228,23 +229,29 @@
             }
         }
 
-        // 15 Character Limit & Formatting Logic
+        /**
+         * FIX: Character limiting that preserves cursor position
+         */
         function limitName(el) {
             if (el.innerText.length > 15) {
+                // Save current caret position
+                const selection = window.getSelection();
+                const range = selection.getRangeAt(0);
+                const offset = range.startOffset;
+
+                // Truncate
                 el.innerText = el.innerText.substring(0, 15);
-                // Move cursor to end after truncation
-                const range = document.createRange();
-                const sel = window.getSelection();
-                range.selectNodeContents(el);
-                range.collapse(false);
-                sel.removeAllRanges();
-                sel.addRange(range);
+
+                // Restore caret position
+                const newRange = document.createRange();
+                newRange.setStart(el.childNodes[0] || el, Math.min(offset, 15));
+                newRange.collapse(true);
+                selection.removeAllRanges();
+                selection.addRange(newRange);
             }
-            // Force Uppercase
-            el.innerText = el.innerText.toUpperCase();
+            save(); // Autosave as they type
         }
 
-        // Handle Enter key for names
         document.querySelectorAll('.name-slot').forEach(slot => {
             slot.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') {
@@ -252,10 +259,6 @@
                     slot.blur();
                 }
             });
-            // Ensure touch selects name for editing on Android
-            slot.addEventListener('touchstart', (e) => {
-                e.stopPropagation();
-            }, {passive: true});
         });
 
         function toggleBreak() { breakSide = breakSide === 1 ? 2 : 1; updateArrow(); save(); }
