@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <link rel="manifest" href="manifest.json?v=49">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#000000">
     <title>Chalky Trousers Scoreboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;700;900&display=swap" rel="stylesheet">
@@ -46,7 +44,6 @@
             touch-action: none; 
         }
 
-        /* VITAL: Background on html/body ensures edge-to-edge color on iOS */
         body, html {
             margin: 0; padding: 0; 
             height: 100dvh; width: 100vw;
@@ -59,7 +56,6 @@
         .main-wrapper {
             display: flex; flex-direction: column; 
             height: 100dvh; width: 100%;
-            /* Uses iOS environment variables to handle the swipe bar area */
             padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
 
@@ -67,12 +63,13 @@
             display: flex; justify-content: space-between; align-items: center;
             padding: 0 10px; height: var(--nav-h);
             border-bottom: 1px solid var(--border-color); flex-shrink: 0;
-            margin-top: env(safe-area-inset-top); /* Shifts content below notch */
+            margin-top: env(safe-area-inset-top);
         }
 
         .logo-text { font-size: 0.65rem; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; }
-        .nav-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #888; padding: 1px 8px; border-radius: 4px; font-size: 0.6rem; }
+        .nav-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #888; padding: 1px 8px; border-radius: 4px; font-size: 0.6rem; cursor: pointer; }
         .nav-btn.reset { background: var(--accent-red-subtle); border: 1px solid rgba(255, 68, 68, 0.3); color: white; }
+        .nav-btn.undo { border-color: var(--accent-green); color: var(--accent-green); font-weight: 700; }
 
         .names-banner { display: flex; height: var(--name-h); background: var(--banner-bg); border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
         .name-slot { 
@@ -125,34 +122,36 @@
         
         .score-num { 
             font-size: clamp(7rem, 28vw, 33rem); font-weight: 700; line-height: 0.85; 
-            text-shadow: 0 0 30px rgba(0,0,0,0.6); cursor: pointer;
+            text-shadow: 0 0 30px rgba(0,0,0,0.6); cursor: pointer; transition: color 0.1s ease;
         }
 
         #orientation-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 10000; flex-direction: column; justify-content: center; align-items: center; }
         @media screen and (orientation: portrait) { #orientation-overlay { display: flex; } .main-wrapper { display: none; } }
-        body.fullscreen-focus .top-nav, body.fullscreen-focus .names-banner { display: none; }
-        #exit-focus { display: none; position: fixed; top: 10px; right: 10px; z-index: 1000; background: rgba(0,0,0,0.8); border: 1px solid var(--border-color); color: #fff; padding: 8px 12px; border-radius: 6px; font-size: 0.7rem; }
-        body.fullscreen-focus #exit-focus { display: block; }
     </style>
 </head>
 <body>
     <div id="orientation-overlay"><h2>ROTATE TO LANDSCAPE</h2></div>
-    <button id="exit-focus" onclick="toggleFS()">✕ Show Controls</button>
+    
     <div class="main-wrapper">
         <header class="top-nav">
             <div class="logo-text">WWW.CHALKYTROUSERS.CO.UK</div>
             <div style="display:flex; gap:10px;">
+                <button class="nav-btn undo" id="undo-btn" style="display:none;" onclick="undoReset()">Undo</button>
                 <button class="nav-btn" id="fs-btn" style="display:none;" onclick="toggleFS()">⛶ Fullscreen</button>
                 <button class="nav-btn reset" onclick="resetMatch()">Reset</button>
             </div>
         </header>
+
         <nav class="names-banner">
             <div class="name-slot" onclick="changeName('p1-txt')"><span id="p1-txt">PLAYER 1</span></div>
             <div class="name-spacer"></div>
             <div class="name-slot" onclick="changeName('p2-txt')"><span id="p2-txt">PLAYER 2</span></div>
         </nav>
+
         <main class="scores-area">
-            <section class="score-pane"><div class="score-num" id="s1" onpointerdown="scStart(event, 's1')" onpointerup="scEnd(event, 's1')" onpointerleave="scCancel('s1')">0</div></section>
+            <section class="score-pane">
+                <div class="score-num" id="s1" onpointerdown="scStart(event, 's1')" onpointerup="scEnd(event, 's1')" onpointerleave="scCancel('s1')">0</div>
+            </section>
             
             <section class="middle-banner">
                 <div class="middle-section">
@@ -166,13 +165,16 @@
                     <div class="middle-section">
                         <div class="middle-label">RACE TO</div>
                         <select id="race-to-select" class="mid-select" onchange="save()">
-                            <option value="-">-</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option><option value="21">21</option>
-                        </select>
+                            <option value="-">-</option>
+                            </select>
                     </div>
                     <div class="middle-section">
                         <div class="middle-label">RULES</div>
                         <select id="ruleset-select" class="mid-select" onchange="save()">
-                            <option value="uk8">uk8</option><option value="wpa">wpa</option><option value="ultimate">ultimate</option><option value="custom">custom</option>
+                            <option value="uk8">uk8</option>
+                            <option value="wpa">wpa</option>
+                            <option value="ultimate">ultimate</option>
+                            <option value="custom">custom</option>
                         </select>
                     </div>
                 </div>
@@ -182,25 +184,111 @@
                 <img id="logo-img" src="https://chalkytrousers.github.io/Chalky-Trousers-App-Android/assets/ct-logo-text.png?v=205" class="middle-logo" alt="Logo">
             </section>
 
-            <section class="score-pane"><div class="score-num" id="s2" onpointerdown="scStart(event, 's2')" onpointerup="scEnd(event, 's2')" onpointerleave="scCancel('s2')">0</div></section>
+            <section class="score-pane">
+                <div class="score-num" id="s2" onpointerdown="scStart(event, 's2')" onpointerup="scEnd(event, 's2')" onpointerleave="scCancel('s2')">0</div>
+            </section>
         </main>
     </div>
+
     <script>
         const KEY = 'ct_v8_data';
-        function save() { const d = { s1: document.getElementById('s1').innerText, s2: document.getElementById('s2').innerText, p1: document.getElementById('p1-txt').innerText, p2: document.getElementById('p2-txt').innerText, side: breakSide, rules: document.getElementById('ruleset-select').value, race: document.getElementById('race-to-select').value }; localStorage.setItem(KEY, JSON.stringify(d)); }
-        function load() { const s = localStorage.getItem(KEY); if (s) { const d = JSON.parse(s); document.getElementById('s1').innerText = d.s1 || "0"; document.getElementById('s2').innerText = d.s2 || "0"; document.getElementById('p1-txt').innerText = d.p1 || "PLAYER 1"; document.getElementById('p2-txt').innerText = d.p2 || "PLAYER 2"; breakSide = d.side || 1; updateArrow(); document.getElementById('ruleset-select').value = d.rules || "uk8"; document.getElementById('race-to-select').value = d.race || "-"; } }
-        let breakSide = 1; function toggleBreak() { breakSide = breakSide === 1 ? 2 : 1; updateArrow(); save(); }
+        let breakSide = 1;
+        let lastScores = null;
+        let undoTimeout = null;
+
+        function save() {
+            const d = {
+                s1: document.getElementById('s1').innerText,
+                s2: document.getElementById('s2').innerText,
+                p1: document.getElementById('p1-txt').innerText,
+                p2: document.getElementById('p2-txt').innerText,
+                side: breakSide,
+                rules: document.getElementById('ruleset-select').value,
+                race: document.getElementById('race-to-select').value
+            };
+            localStorage.setItem(KEY, JSON.stringify(d));
+        }
+
+        function load() {
+            const s = localStorage.getItem(KEY);
+            if (s) {
+                const d = JSON.parse(s);
+                document.getElementById('s1').innerText = d.s1 || "0";
+                document.getElementById('s2').innerText = d.s2 || "0";
+                document.getElementById('p1-txt').innerText = d.p1 || "PLAYER 1";
+                document.getElementById('p2-txt').innerText = d.p2 || "PLAYER 2";
+                breakSide = d.side || 1;
+                updateArrow();
+                document.getElementById('ruleset-select').value = d.rules || "uk8";
+                document.getElementById('race-to-select').value = d.race || "-";
+            }
+        }
+
+        function toggleBreak() { breakSide = breakSide === 1 ? 2 : 1; updateArrow(); save(); }
         function updateArrow() { const a = document.getElementById('svg-arrow'); if (breakSide === 1) a.classList.remove('flipped'); else a.classList.add('flipped'); }
-        function changeName(id) { const el = document.getElementById(id); const res = prompt("Enter Name:", el.innerText); if (res) { el.innerText = res.toUpperCase(); save(); } }
+        
+        function changeName(id) { 
+            const el = document.getElementById(id); 
+            const res = prompt("Enter Name:", el.innerText); 
+            if (res) { el.innerText = res.toUpperCase(); save(); } 
+        }
+
         let holdT, isHold = false;
         function scStart(e, id) { if (e.cancelable) e.preventDefault(); isHold = false; holdT = setTimeout(() => { isHold = true; upd(id, -1); flash(id, '#ff4444'); }, 600); }
         function scEnd(e, id) { clearTimeout(holdT); if (!isHold) { upd(id, 1); flash(id, '#22ff6d'); } }
         function scCancel(id) { clearTimeout(holdT); }
         function upd(id, n) { const el = document.getElementById(id); let v = parseInt(el.innerText) + n; el.innerText = v < 0 ? 0 : v; save(); }
         function flash(id, c) { const el = document.getElementById(id); const o = el.style.color; el.style.color = c; setTimeout(() => el.style.color = o, 200); }
-        function resetMatch() { if (confirm("Reset current match scores?")) { document.getElementById('s1').innerText = "0"; document.getElementById('s2').innerText = "0"; save(); } }
-        function toggleFS() { const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); if (isIOS) document.body.classList.toggle('fullscreen-focus'); else { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); } }
-        window.addEventListener('load', () => { load(); const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); const isSA = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches; if (!isIOS || !isSA) document.getElementById('fs-btn').style.display = 'block'; });
+
+        function resetMatch() {
+            // Save state for undo
+            lastScores = {
+                s1: document.getElementById('s1').innerText,
+                s2: document.getElementById('s2').innerText
+            };
+            
+            // Perform reset
+            document.getElementById('s1').innerText = "0";
+            document.getElementById('s2').innerText = "0";
+            save();
+
+            // Handle Undo Visibility
+            const ub = document.getElementById('undo-btn');
+            ub.style.display = 'block';
+            clearTimeout(undoTimeout);
+            undoTimeout = setTimeout(() => { ub.style.display = 'none'; }, 5000);
+        }
+
+        function undoReset() {
+            if (lastScores) {
+                document.getElementById('s1').innerText = lastScores.s1;
+                document.getElementById('s2').innerText = lastScores.s2;
+                lastScores = null;
+                document.getElementById('undo-btn').style.display = 'none';
+                save();
+            }
+        }
+
+        function toggleFS() {
+            if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+            else document.exitFullscreen();
+        }
+
+        window.addEventListener('load', () => {
+            // Fill Race To options
+            const raceSel = document.getElementById('race-to-select');
+            for(let i=1; i<=21; i++) {
+                let opt = document.createElement('option');
+                opt.value = i; opt.innerText = i;
+                raceSel.appendChild(opt);
+            }
+            load();
+            // Android check for FS button visibility
+            if (!window.matchMedia('(display-mode: standalone)').matches) {
+                document.getElementById('fs-btn').style.display = 'block';
+            }
+        });
+
         window.oncontextmenu = (e) => { if(e.target.classList.contains('score-num')) { e.preventDefault(); return false; } };
     </script>
 </body>
