@@ -19,20 +19,20 @@
             --middle-width: clamp(85px, 13vw, 140px);
             --nav-h: 32px;
             --name-h: 44px;
-            --footer-h: 12px;
-            --mid-gap: 1.5vh;
-            --label-fs: 0.7rem;
-            --logo-h: 50px; /* Fixed height for consistent anchoring */
+            --mid-gap: 1vh;
+            --label-fs: 0.65rem;
+            --logo-mh: 30px;
+            --spring-min: 10px;
         }
 
         @media screen and (min-aspect-ratio: 21/10) {
             :root {
-                --middle-width: 170px; 
+                --middle-width: 160px; 
                 --name-h: 60px;       
-                --footer-h: 18px;
-                --mid-gap: 2.5vh;     
-                --label-fs: 0.9rem;  
-                --logo-h: 80px; 
+                --mid-gap: 2vh;     
+                --label-fs: 0.85rem;  
+                --logo-mh: 55px;
+                --spring-min: 30px;
             }
         }
 
@@ -57,7 +57,7 @@
         .main-wrapper {
             display: flex; flex-direction: column; 
             height: 100dvh; width: 100%;
-            padding: 0 env(safe-area-inset-right) 0 env(safe-area-inset-left);
+            padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
 
         .top-nav {
@@ -76,56 +76,61 @@
         .name-slot { 
             flex: 1; display: flex; justify-content: center; align-items: center; 
             font-size: clamp(1.2rem, 3.8vw, 3.2rem); font-weight: 900; 
-            text-transform: uppercase; color: #bbb; overflow: hidden; white-space: nowrap; outline: none;
+            text-transform: uppercase;
+            color: #bbb; overflow: hidden; white-space: nowrap;
+            outline: none;
             touch-action: pan-y;
         }
         .name-slot:focus { color: var(--accent-green); background: rgba(255,255,255,0.05); }
-        .name-spacer { width: var(--middle-width); background: rgba(0,0,0,0.8); }
+
+        .name-spacer { width: var(--middle-width); background: rgba(0,0,0,0.6); }
 
         .scores-area { display: flex; flex: 1; width: 100%; overflow: hidden; }
         .score-pane { flex: 1; display: flex; justify-content: center; align-items: center; }
 
         .middle-banner {
             width: var(--middle-width); 
-            display: flex;
-            flex-direction: column;
-            background: rgba(0,0,0,0.8);
+            display: grid;
+            grid-template-rows: auto auto minmax(var(--spring-min), 1fr) auto;
+            background: rgba(0,0,0,0.6); 
             border-left: 1px solid var(--border-color); 
             border-right: 1px solid var(--border-color);
             flex-shrink: 0;
-            padding-top: 15px;
-            position: relative; /* Base for absolute logo positioning */
+            padding: 10px 0;
         }
 
         .middle-section { text-align: center; width: 100%; padding: 0 5px; }
         .middle-label { 
-            font-size: var(--label-fs); font-weight: 900; color: #f0f0f0; 
-            text-transform: uppercase; margin-bottom: 2px; letter-spacing: 0.08rem;
-            text-shadow: 0 0 5px rgba(0,0,0,0.5);
+            font-size: var(--label-fs); 
+            font-weight: 900; 
+            color: #ffffff; /* Brightened to pure white */
+            text-transform: uppercase; 
+            margin-bottom: 1px; 
+            text-shadow: 0 0 4px rgba(0,0,0,0.5);
         }
         
-        .break-arrow-svg { width: 42px; height: 42px; fill: var(--accent-green); filter: drop-shadow(0 0 8px rgba(34, 255, 109, 0.6)); transition: transform 0.3s ease; }
+        .break-arrow-svg { width: 36px; height: 36px; fill: var(--accent-green); filter: drop-shadow(0 0 8px rgba(34, 255, 109, 0.6)); transition: transform 0.3s ease; }
         .flipped { transform: scaleX(-1); }
 
-        .details-group { display: flex; flex-direction: column; gap: var(--mid-gap); margin-top: 15px; }
+        .details-group {
+            display: flex; flex-direction: column;
+            gap: var(--mid-gap);
+            margin-top: 10px;
+        }
+
         .mid-select {
-            background: #1a1a1a; border: 1px solid #444; color: #fff; padding: 4px 0; border-radius: 4px;
-            font-family: inherit; font-size: 0.8rem; font-weight: 700; width: 92%; 
+            background: #1a1a1a; border: 1px solid #333; color: #999; padding: 2px 0; border-radius: 4px;
+            font-family: inherit; font-size: 0.75rem; font-weight: 700; width: 92%; 
             appearance: none; -webkit-appearance: none; text-align: center; text-align-last: center;
         }
 
-        /* LOGO PINNED TO BOTTOM OF COLUMN */
+        .spacer-spring { width: 100%; }
+
         .middle-logo { 
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%; 
-            height: var(--logo-h); 
-            opacity: 0.95; 
-            object-fit: contain;
+            width: 85%; max-height: var(--logo-mh); height: auto; 
+            opacity: 0.7; object-fit: contain; margin: 0 auto;
             display: block;
-            padding: 5px;
+            padding-bottom: 10px;
         }
         
         .score-num { 
@@ -133,19 +138,11 @@
             text-shadow: 0 0 30px rgba(0,0,0,0.6); cursor: pointer; color: white;
         }
 
+        /* FIXED FLASH ANIMATIONS (Prevents colors getting stuck) */
         @keyframes flashGreen { 0% { color: var(--accent-green); } 100% { color: white; } }
         @keyframes flashRed { 0% { color: var(--accent-red); } 100% { color: white; } }
         .f-green { animation: flashGreen 0.4s ease-out forwards; }
         .f-red { animation: flashRed 0.4s ease-out forwards; }
-
-        .bottom-banner {
-            height: var(--footer-h);
-            background: #000000;
-            width: 100%;
-            border-top: 1px solid var(--border-color);
-            flex-shrink: 0;
-            padding-bottom: env(safe-area-inset-bottom);
-        }
 
         #orientation-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 10000; flex-direction: column; justify-content: center; align-items: center; }
         @media screen and (orientation: portrait) { #orientation-overlay { display: flex; } .main-wrapper { display: none; } }
@@ -201,6 +198,8 @@
                     </div>
                 </div>
 
+                <div class="spacer-spring"></div>
+
                 <img id="logo-img" src="https://chalkytrousers.github.io/Chalky-Trousers-App-Android/assets/ct-logo-text.png?v=205" class="middle-logo" alt="Logo">
             </section>
 
@@ -208,8 +207,6 @@
                 <div class="score-num" id="s2" onpointerdown="scStart(event, 's2')" onpointerup="scEnd(event, 's2')" onpointerleave="scCancel('s2')">0</div>
             </section>
         </main>
-
-        <footer class="bottom-banner"></footer>
     </div>
 
     <script>
@@ -264,7 +261,10 @@
 
         document.querySelectorAll('.name-slot').forEach(slot => {
             slot.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') { e.preventDefault(); slot.blur(); }
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    slot.blur();
+                }
             });
         });
 
@@ -302,7 +302,7 @@
             const el = document.getElementById(id);
             const cls = type === 'green' ? 'f-green' : 'f-red';
             el.classList.remove('f-green', 'f-red');
-            void el.offsetWidth;
+            void el.offsetWidth; // Trigger reflow to restart animation
             el.classList.add(cls);
         }
 
