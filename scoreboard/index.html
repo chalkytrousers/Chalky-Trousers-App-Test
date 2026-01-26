@@ -96,7 +96,7 @@
         .middle-section { text-align: center; width: 100%; padding: 0 5px; }
         .middle-label { font-size: var(--label-fs); font-weight: 900; color: #555; text-transform: uppercase; margin-bottom: 1px; }
         
-        .break-arrow-svg { width: 36px; height: 36px; fill: var(--accent-green); filter: drop-shadow(0 0 8px rgba(34, 255, 109, 0.6)); }
+        .break-arrow-svg { width: 36px; height: 36px; fill: var(--accent-green); filter: drop-shadow(0 0 8px rgba(34, 255, 109, 0.6)); transition: transform 0.3s ease; }
         .flipped { transform: scaleX(-1); }
 
         .details-group {
@@ -166,7 +166,7 @@
                         <div class="middle-label">RACE TO</div>
                         <select id="race-to-select" class="mid-select" onchange="save()">
                             <option value="-">-</option>
-                            </select>
+                        </select>
                     </div>
                     <div class="middle-section">
                         <div class="middle-label">RULES</div>
@@ -194,6 +194,7 @@
         const KEY = 'ct_v8_data';
         let breakSide = 1;
         let lastScores = null;
+        let lastBreakSide = null; // Store break side for undo
         let undoTimeout = null;
 
         function save() {
@@ -235,9 +236,22 @@
 
         let holdT, isHold = false;
         function scStart(e, id) { if (e.cancelable) e.preventDefault(); isHold = false; holdT = setTimeout(() => { isHold = true; upd(id, -1); flash(id, '#ff4444'); }, 600); }
-        function scEnd(e, id) { clearTimeout(holdT); if (!isHold) { upd(id, 1); flash(id, '#22ff6d'); } }
+        function scEnd(e, id) { clearTimeout(holdT); if (!isHold) { upd(id, 1, true); flash(id, '#22ff6d'); } }
         function scCancel(id) { clearTimeout(holdT); }
-        function upd(id, n) { const el = document.getElementById(id); let v = parseInt(el.innerText) + n; el.innerText = v < 0 ? 0 : v; save(); }
+
+        function upd(id, n, isWin = false) { 
+            const el = document.getElementById(id); 
+            let v = parseInt(el.innerText) + n; 
+            el.innerText = v < 0 ? 0 : v; 
+            
+            // If a point was added (win), toggle the break side
+            if (isWin && n > 0) {
+                toggleBreak();
+            } else {
+                save(); 
+            }
+        }
+
         function flash(id, c) { const el = document.getElementById(id); const o = el.style.color; el.style.color = c; setTimeout(() => el.style.color = o, 200); }
 
         function resetMatch() {
@@ -246,13 +260,13 @@
                 s1: document.getElementById('s1').innerText,
                 s2: document.getElementById('s2').innerText
             };
+            lastBreakSide = breakSide;
             
             // Perform reset
             document.getElementById('s1').innerText = "0";
             document.getElementById('s2').innerText = "0";
             save();
 
-            // Handle Undo Visibility
             const ub = document.getElementById('undo-btn');
             ub.style.display = 'block';
             clearTimeout(undoTimeout);
@@ -263,6 +277,8 @@
             if (lastScores) {
                 document.getElementById('s1').innerText = lastScores.s1;
                 document.getElementById('s2').innerText = lastScores.s2;
+                breakSide = lastBreakSide;
+                updateArrow();
                 lastScores = null;
                 document.getElementById('undo-btn').style.display = 'none';
                 save();
@@ -275,7 +291,6 @@
         }
 
         window.addEventListener('load', () => {
-            // Fill Race To options
             const raceSel = document.getElementById('race-to-select');
             for(let i=1; i<=21; i++) {
                 let opt = document.createElement('option');
@@ -283,7 +298,6 @@
                 raceSel.appendChild(opt);
             }
             load();
-            // Android check for FS button visibility
             if (!window.matchMedia('(display-mode: standalone)').matches) {
                 document.getElementById('fs-btn').style.display = 'block';
             }
