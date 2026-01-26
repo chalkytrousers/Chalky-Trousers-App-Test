@@ -13,12 +13,13 @@
             --bg-dark: #000000;
             --banner-bg: #111111;
             --accent-green: #22ff6d;
+            --accent-red: #ff4444;
             --accent-red-subtle: rgba(255, 68, 68, 0.2);
             --border-color: rgba(255, 255, 255, 0.1);
             --middle-width: clamp(85px, 13vw, 140px);
             --nav-h: 32px;
             --name-h: 44px;
-            --footer-h: 12px; /* Height of the very bottom black bar */
+            --footer-h: 12px;
             --mid-gap: 1.5vh;
             --label-fs: 0.7rem;
             --logo-mh: 65px; 
@@ -43,7 +44,7 @@
             -webkit-user-select: none !important; 
             -webkit-touch-callout: none !important; 
             -webkit-tap-highlight-color: transparent; 
-            touch-action: pan-y;
+            touch-action: none; /* Forced back to none for scoring precision */
         }
 
         body, html {
@@ -58,7 +59,6 @@
         .main-wrapper {
             display: flex; flex-direction: column; 
             height: 100dvh; width: 100%;
-            /* env handles the physical screen cutouts */
             padding: 0 env(safe-area-inset-right) 0 env(safe-area-inset-left);
         }
 
@@ -79,6 +79,7 @@
             flex: 1; display: flex; justify-content: center; align-items: center; 
             font-size: clamp(1.2rem, 3.8vw, 3.2rem); font-weight: 900; 
             text-transform: uppercase; color: #bbb; overflow: hidden; white-space: nowrap; outline: none;
+            touch-action: pan-y; /* Allow interaction for typing */
         }
         .name-slot:focus { color: var(--accent-green); background: rgba(255,255,255,0.05); }
         .name-spacer { width: var(--middle-width); background: rgba(0,0,0,0.8); }
@@ -119,22 +120,28 @@
         .middle-logo { 
             width: 100%; max-height: var(--logo-mh); height: auto; 
             opacity: 0.95; object-fit: contain; margin: 0 auto;
-            display: block; padding: 0 8px 10px 8px; /* Added padding to bottom to lift off banner */
+            display: block; padding: 0 8px 10px 8px;
         }
         
         .score-num { 
             font-size: clamp(7rem, 28vw, 33rem); font-weight: 700; line-height: 0.85; 
-            text-shadow: 0 0 30px rgba(0,0,0,0.6); cursor: pointer; transition: color 0.1s ease;
+            text-shadow: 0 0 30px rgba(0,0,0,0.6); cursor: pointer; color: white;
         }
 
-        /* NEW BOTTOM BANNER */
+        /* FIXED FLASH ANIMATIONS */
+        @keyframes flashGreen { 0% { color: var(--accent-green); } 100% { color: white; } }
+        @keyframes flashRed { 0% { color: var(--accent-red); } 100% { color: white; } }
+        
+        .f-green { animation: flashGreen 0.4s ease-out forwards; }
+        .f-red { animation: flashRed 0.4s ease-out forwards; }
+
         .bottom-banner {
             height: var(--footer-h);
             background: #000000;
             width: 100%;
             border-top: 1px solid var(--border-color);
             flex-shrink: 0;
-            padding-bottom: env(safe-area-inset-bottom); /* Essential for Android Nav bar area */
+            padding-bottom: env(safe-area-inset-bottom);
         }
 
         #orientation-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 10000; flex-direction: column; justify-content: center; align-items: center; }
@@ -264,8 +271,22 @@
         function updateArrow() { const a = document.getElementById('svg-arrow'); if (breakSide === 1) a.classList.remove('flipped'); else a.classList.add('flipped'); }
         
         let holdT, isHold = false;
-        function scStart(e, id) { if (e.cancelable) e.preventDefault(); isHold = false; holdT = setTimeout(() => { isHold = true; upd(id, -1); flash(id, '#ff4444'); }, 600); }
-        function scEnd(e, id) { clearTimeout(holdT); if (!isHold) { upd(id, 1, true); flash(id, '#22ff6d'); } }
+        function scStart(e, id) { 
+            if (e.cancelable) e.preventDefault(); 
+            isHold = false; 
+            holdT = setTimeout(() => { 
+                isHold = true; 
+                upd(id, -1); 
+                flash(id, 'red'); 
+            }, 600); 
+        }
+        function scEnd(e, id) { 
+            clearTimeout(holdT); 
+            if (!isHold) { 
+                upd(id, 1, true); 
+                flash(id, 'green'); 
+            } 
+        }
         function scCancel(id) { clearTimeout(holdT); }
 
         function upd(id, n, isWin = false) { 
@@ -276,7 +297,14 @@
             else save(); 
         }
 
-        function flash(id, c) { const el = document.getElementById(id); const o = el.style.color; el.style.color = c; setTimeout(() => el.style.color = o, 200); }
+        // Updated Flash with CSS Classes
+        function flash(id, type) {
+            const el = document.getElementById(id);
+            const cls = type === 'green' ? 'f-green' : 'f-red';
+            el.classList.remove('f-green', 'f-red');
+            void el.offsetWidth; // Trigger reflow to restart animation
+            el.classList.add(cls);
+        }
 
         function resetMatch() {
             lastScores = { s1: document.getElementById('s1').innerText, s2: document.getElementById('s2').innerText };
