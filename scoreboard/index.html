@@ -41,7 +41,7 @@
             -webkit-user-select: none !important; 
             -webkit-touch-callout: none !important; 
             -webkit-tap-highlight-color: transparent; 
-            touch-action: none; 
+            touch-action: pan-y; /* Changed from none to allow some interaction */
         }
 
         body, html {
@@ -74,9 +74,12 @@
         .names-banner { display: flex; height: var(--name-h); background: var(--banner-bg); border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
         .name-slot { 
             flex: 1; display: flex; justify-content: center; align-items: center; 
-            font-size: clamp(1.6rem, 3.8vw, 3.2rem); font-weight: 900; 
+            font-size: clamp(1.2rem, 3.8vw, 3.2rem); font-weight: 900; 
             text-transform: uppercase; color: #bbb; overflow: hidden; white-space: nowrap;
+            outline: none; /* Removes focus ring when editing */
         }
+        .name-slot:focus { color: var(--accent-green); background: rgba(255,255,255,0.05); }
+
         .name-spacer { width: var(--middle-width); background: rgba(0,0,0,0.6); }
 
         .scores-area { display: flex; flex: 1; width: 100%; overflow: hidden; }
@@ -143,9 +146,9 @@
         </header>
 
         <nav class="names-banner">
-            <div class="name-slot" onclick="changeName('p1-txt')"><span id="p1-txt">PLAYER 1</span></div>
+            <div class="name-slot" id="p1-txt" contenteditable="true" spellcheck="false" oninput="limitName(this)" onblur="save()">PLAYER 1</div>
             <div class="name-spacer"></div>
-            <div class="name-slot" onclick="changeName('p2-txt')"><span id="p2-txt">PLAYER 2</span></div>
+            <div class="name-slot" id="p2-txt" contenteditable="true" spellcheck="false" oninput="limitName(this)" onblur="save()">PLAYER 2</div>
         </nav>
 
         <main class="scores-area">
@@ -194,7 +197,7 @@
         const KEY = 'ct_v8_data';
         let breakSide = 1;
         let lastScores = null;
-        let lastBreakSide = null; // Store break side for undo
+        let lastBreakSide = null;
         let undoTimeout = null;
 
         function save() {
@@ -216,8 +219,8 @@
                 const d = JSON.parse(s);
                 document.getElementById('s1').innerText = d.s1 || "0";
                 document.getElementById('s2').innerText = d.s2 || "0";
-                document.getElementById('p1-txt').innerText = d.p1 || "PLAYER 1";
-                document.getElementById('p2-txt').innerText = d.p2 || "PLAYER 2";
+                document.getElementById('p1-txt').innerText = (d.p1 || "PLAYER 1").toUpperCase();
+                document.getElementById('p2-txt').innerText = (d.p2 || "PLAYER 2").toUpperCase();
                 breakSide = d.side || 1;
                 updateArrow();
                 document.getElementById('ruleset-select').value = d.rules || "uk8";
@@ -225,15 +228,39 @@
             }
         }
 
+        // 15 Character Limit & Formatting Logic
+        function limitName(el) {
+            if (el.innerText.length > 15) {
+                el.innerText = el.innerText.substring(0, 15);
+                // Move cursor to end after truncation
+                const range = document.createRange();
+                const sel = window.getSelection();
+                range.selectNodeContents(el);
+                range.collapse(false);
+                sel.removeAllRanges();
+                sel.addRange(range);
+            }
+            // Force Uppercase
+            el.innerText = el.innerText.toUpperCase();
+        }
+
+        // Handle Enter key for names
+        document.querySelectorAll('.name-slot').forEach(slot => {
+            slot.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    slot.blur();
+                }
+            });
+            // Ensure touch selects name for editing on Android
+            slot.addEventListener('touchstart', (e) => {
+                e.stopPropagation();
+            }, {passive: true});
+        });
+
         function toggleBreak() { breakSide = breakSide === 1 ? 2 : 1; updateArrow(); save(); }
         function updateArrow() { const a = document.getElementById('svg-arrow'); if (breakSide === 1) a.classList.remove('flipped'); else a.classList.add('flipped'); }
         
-        function changeName(id) { 
-            const el = document.getElementById(id); 
-            const res = prompt("Enter Name:", el.innerText); 
-            if (res) { el.innerText = res.toUpperCase(); save(); } 
-        }
-
         let holdT, isHold = false;
         function scStart(e, id) { if (e.cancelable) e.preventDefault(); isHold = false; holdT = setTimeout(() => { isHold = true; upd(id, -1); flash(id, '#ff4444'); }, 600); }
         function scEnd(e, id) { clearTimeout(holdT); if (!isHold) { upd(id, 1, true); flash(id, '#22ff6d'); } }
@@ -243,30 +270,18 @@
             const el = document.getElementById(id); 
             let v = parseInt(el.innerText) + n; 
             el.innerText = v < 0 ? 0 : v; 
-            
-            // If a point was added (win), toggle the break side
-            if (isWin && n > 0) {
-                toggleBreak();
-            } else {
-                save(); 
-            }
+            if (isWin && n > 0) toggleBreak();
+            else save(); 
         }
 
         function flash(id, c) { const el = document.getElementById(id); const o = el.style.color; el.style.color = c; setTimeout(() => el.style.color = o, 200); }
 
         function resetMatch() {
-            // Save state for undo
-            lastScores = {
-                s1: document.getElementById('s1').innerText,
-                s2: document.getElementById('s2').innerText
-            };
+            lastScores = { s1: document.getElementById('s1').innerText, s2: document.getElementById('s2').innerText };
             lastBreakSide = breakSide;
-            
-            // Perform reset
             document.getElementById('s1').innerText = "0";
             document.getElementById('s2').innerText = "0";
             save();
-
             const ub = document.getElementById('undo-btn');
             ub.style.display = 'block';
             clearTimeout(undoTimeout);
