@@ -18,20 +18,22 @@
             --middle-width: clamp(85px, 13vw, 140px);
             --nav-h: 32px;
             --name-h: 44px;
+            --footer-h: 12px; /* Height of the very bottom black bar */
             --mid-gap: 1.5vh;
             --label-fs: 0.7rem;
-            --logo-mh: 55px; /* Increased */
-            --spring-min: 15px;
+            --logo-mh: 65px; 
+            --spring-min: 10px;
         }
 
         @media screen and (min-aspect-ratio: 21/10) {
             :root {
                 --middle-width: 170px; 
                 --name-h: 60px;       
+                --footer-h: 18px;
                 --mid-gap: 2.5vh;     
                 --label-fs: 0.9rem;  
-                --logo-mh: 90px; /* Increased */
-                --spring-min: 40px;
+                --logo-mh: 100px;
+                --spring-min: 20px;
             }
         }
 
@@ -56,7 +58,8 @@
         .main-wrapper {
             display: flex; flex-direction: column; 
             height: 100dvh; width: 100%;
-            padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+            /* env handles the physical screen cutouts */
+            padding: 0 env(safe-area-inset-right) 0 env(safe-area-inset-left);
         }
 
         .top-nav {
@@ -75,12 +78,9 @@
         .name-slot { 
             flex: 1; display: flex; justify-content: center; align-items: center; 
             font-size: clamp(1.2rem, 3.8vw, 3.2rem); font-weight: 900; 
-            text-transform: uppercase;
-            color: #bbb; overflow: hidden; white-space: nowrap;
-            outline: none;
+            text-transform: uppercase; color: #bbb; overflow: hidden; white-space: nowrap; outline: none;
         }
         .name-slot:focus { color: var(--accent-green); background: rgba(255,255,255,0.05); }
-
         .name-spacer { width: var(--middle-width); background: rgba(0,0,0,0.8); }
 
         .scores-area { display: flex; flex: 1; width: 100%; overflow: hidden; }
@@ -90,31 +90,24 @@
             width: var(--middle-width); 
             display: grid;
             grid-template-rows: auto auto minmax(var(--spring-min), 1fr) auto;
-            background: rgba(0,0,0,0.8); /* Darkened for better contrast */
+            background: rgba(0,0,0,0.8);
             border-left: 1px solid var(--border-color); 
             border-right: 1px solid var(--border-color);
             flex-shrink: 0;
-            padding: 15px 0;
+            padding-top: 15px;
         }
 
         .middle-section { text-align: center; width: 100%; padding: 0 5px; }
         .middle-label { 
-            font-size: var(--label-fs); font-weight: 900; 
-            color: #f0f0f0; /* Near-white */
-            text-transform: uppercase; margin-bottom: 2px; 
-            letter-spacing: 0.08rem;
+            font-size: var(--label-fs); font-weight: 900; color: #f0f0f0; 
+            text-transform: uppercase; margin-bottom: 2px; letter-spacing: 0.08rem;
             text-shadow: 0 0 5px rgba(0,0,0,0.5);
         }
         
         .break-arrow-svg { width: 42px; height: 42px; fill: var(--accent-green); filter: drop-shadow(0 0 8px rgba(34, 255, 109, 0.6)); transition: transform 0.3s ease; }
         .flipped { transform: scaleX(-1); }
 
-        .details-group {
-            display: flex; flex-direction: column;
-            gap: var(--mid-gap);
-            margin-top: 15px;
-        }
-
+        .details-group { display: flex; flex-direction: column; gap: var(--mid-gap); margin-top: 15px; }
         .mid-select {
             background: #1a1a1a; border: 1px solid #444; color: #fff; padding: 4px 0; border-radius: 4px;
             font-family: inherit; font-size: 0.8rem; font-weight: 700; width: 92%; 
@@ -124,17 +117,24 @@
         .spacer-spring { width: 100%; }
 
         .middle-logo { 
-            width: 100%; /* Max width */
-            max-height: var(--logo-mh); height: auto; 
-            opacity: 0.95; 
-            object-fit: contain; margin: 0 auto;
-            display: block;
-            padding: 0 5px 15px 5px;
+            width: 100%; max-height: var(--logo-mh); height: auto; 
+            opacity: 0.95; object-fit: contain; margin: 0 auto;
+            display: block; padding: 0 8px 10px 8px; /* Added padding to bottom to lift off banner */
         }
         
         .score-num { 
             font-size: clamp(7rem, 28vw, 33rem); font-weight: 700; line-height: 0.85; 
             text-shadow: 0 0 30px rgba(0,0,0,0.6); cursor: pointer; transition: color 0.1s ease;
+        }
+
+        /* NEW BOTTOM BANNER */
+        .bottom-banner {
+            height: var(--footer-h);
+            background: #000000;
+            width: 100%;
+            border-top: 1px solid var(--border-color);
+            flex-shrink: 0;
+            padding-bottom: env(safe-area-inset-bottom); /* Essential for Android Nav bar area */
         }
 
         #orientation-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 10000; flex-direction: column; justify-content: center; align-items: center; }
@@ -200,6 +200,8 @@
                 <div class="score-num" id="s2" onpointerdown="scStart(event, 's2')" onpointerup="scEnd(event, 's2')" onpointerleave="scCancel('s2')">0</div>
             </section>
         </main>
+
+        <footer class="bottom-banner"></footer>
     </div>
 
     <script>
@@ -254,10 +256,7 @@
 
         document.querySelectorAll('.name-slot').forEach(slot => {
             slot.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    slot.blur();
-                }
+                if (e.key === 'Enter') { e.preventDefault(); slot.blur(); }
             });
         });
 
