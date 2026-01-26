@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <link rel="manifest" href="manifest.json?v=49">
     <meta name="theme-color" content="#000000">
     <title>Chalky Trousers Scoreboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;700;900&display=swap" rel="stylesheet">
@@ -40,7 +39,6 @@
             box-sizing: border-box; 
             user-select: none !important; 
             -webkit-user-select: none !important; 
-            -webkit-touch-callout: none !important; 
             -webkit-tap-highlight-color: transparent; 
             touch-action: none; 
         }
@@ -76,13 +74,10 @@
         .name-slot { 
             flex: 1; display: flex; justify-content: center; align-items: center; 
             font-size: clamp(1.2rem, 3.8vw, 3.2rem); font-weight: 900; 
-            text-transform: uppercase;
-            color: #bbb; overflow: hidden; white-space: nowrap;
-            outline: none;
+            text-transform: uppercase; color: #bbb; overflow: hidden; white-space: nowrap; outline: none;
             touch-action: pan-y;
         }
         .name-slot:focus { color: var(--accent-green); background: rgba(255,255,255,0.05); }
-
         .name-spacer { width: var(--middle-width); background: rgba(0,0,0,0.6); }
 
         .scores-area { display: flex; flex: 1; width: 100%; overflow: hidden; }
@@ -101,44 +96,25 @@
 
         .middle-section { text-align: center; width: 100%; padding: 0 5px; }
         .middle-label { 
-            font-size: var(--label-fs); 
-            font-weight: 900; 
-            color: #ffffff; /* Brightened to pure white */
-            text-transform: uppercase; 
-            margin-bottom: 1px; 
-            text-shadow: 0 0 4px rgba(0,0,0,0.5);
+            font-size: var(--label-fs); font-weight: 900; color: #ffffff; 
+            text-transform: uppercase; margin-bottom: 1px; text-shadow: 0 0 4px rgba(0,0,0,0.5);
         }
         
         .break-arrow-svg { width: 36px; height: 36px; fill: var(--accent-green); filter: drop-shadow(0 0 8px rgba(34, 255, 109, 0.6)); transition: transform 0.3s ease; }
         .flipped { transform: scaleX(-1); }
 
-        .details-group {
-            display: flex; flex-direction: column;
-            gap: var(--mid-gap);
-            margin-top: 10px;
-        }
-
+        .details-group { display: flex; flex-direction: column; gap: var(--mid-gap); margin-top: 10px; }
         .mid-select {
-            background: #1a1a1a; border: 1px solid #333; color: #999; padding: 2px 0; border-radius: 4px;
+            background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 2px 0; border-radius: 4px;
             font-family: inherit; font-size: 0.75rem; font-weight: 700; width: 92%; 
             appearance: none; -webkit-appearance: none; text-align: center; text-align-last: center;
         }
 
         .spacer-spring { width: 100%; }
-
-        .middle-logo { 
-            width: 85%; max-height: var(--logo-mh); height: auto; 
-            opacity: 0.7; object-fit: contain; margin: 0 auto;
-            display: block;
-            padding-bottom: 10px;
-        }
+        .middle-logo { width: 85%; max-height: var(--logo-mh); height: auto; opacity: 0.7; object-fit: contain; margin: 0 auto; display: block; padding-bottom: 10px; }
         
-        .score-num { 
-            font-size: clamp(7rem, 28vw, 33rem); font-weight: 700; line-height: 0.85; 
-            text-shadow: 0 0 30px rgba(0,0,0,0.6); cursor: pointer; color: white;
-        }
+        .score-num { font-size: clamp(7rem, 28vw, 33rem); font-weight: 700; line-height: 0.85; text-shadow: 0 0 30px rgba(0,0,0,0.6); cursor: pointer; color: white; }
 
-        /* FIXED FLASH ANIMATIONS (Prevents colors getting stuck) */
         @keyframes flashGreen { 0% { color: var(--accent-green); } 100% { color: white; } }
         @keyframes flashRed { 0% { color: var(--accent-red); } 100% { color: white; } }
         .f-green { animation: flashGreen 0.4s ease-out forwards; }
@@ -199,7 +175,6 @@
                 </div>
 
                 <div class="spacer-spring"></div>
-
                 <img id="logo-img" src="https://chalkytrousers.github.io/Chalky-Trousers-App-Android/assets/ct-logo-text.png?v=205" class="middle-logo" alt="Logo">
             </section>
 
@@ -260,12 +235,7 @@
         }
 
         document.querySelectorAll('.name-slot').forEach(slot => {
-            slot.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    slot.blur();
-                }
-            });
+            slot.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); slot.blur(); } });
         });
 
         function toggleBreak() { breakSide = breakSide === 1 ? 2 : 1; updateArrow(); save(); }
@@ -275,19 +245,9 @@
         function scStart(e, id) { 
             if (e.cancelable) e.preventDefault(); 
             isHold = false; 
-            holdT = setTimeout(() => { 
-                isHold = true; 
-                upd(id, -1); 
-                flash(id, 'red'); 
-            }, 600); 
+            holdT = setTimeout(() => { isHold = true; upd(id, -1); flash(id, 'red'); }, 600); 
         }
-        function scEnd(e, id) { 
-            clearTimeout(holdT); 
-            if (!isHold) { 
-                upd(id, 1, true); 
-                flash(id, 'green'); 
-            } 
-        }
+        function scEnd(e, id) { clearTimeout(holdT); if (!isHold) { upd(id, 1, true); flash(id, 'green'); } }
         function scCancel(id) { clearTimeout(holdT); }
 
         function upd(id, n, isWin = false) { 
@@ -302,7 +262,7 @@
             const el = document.getElementById(id);
             const cls = type === 'green' ? 'f-green' : 'f-red';
             el.classList.remove('f-green', 'f-red');
-            void el.offsetWidth; // Trigger reflow to restart animation
+            void el.offsetWidth;
             el.classList.add(cls);
         }
 
@@ -343,9 +303,8 @@
                 raceSel.appendChild(opt);
             }
             load();
-            if (!window.matchMedia('(display-mode: standalone)').matches) {
-                document.getElementById('fs-btn').style.display = 'block';
-            }
+            // Always show FS button in browser mode
+            document.getElementById('fs-btn').style.display = 'block';
         });
 
         window.oncontextmenu = (e) => { if(e.target.classList.contains('score-num')) { e.preventDefault(); return false; } };
