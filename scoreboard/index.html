@@ -1,450 +1,331 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#000000">
-<title>Chalky Trousers Scoreboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#000000">
+    <title>Chalky Trousers Scoreboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;700;900&display=swap" rel="stylesheet">
 
-<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;700;900&display=swap" rel="stylesheet">
-
-<style>
-:root {
-    --bg-dark: #000000;
-    --banner-bg: #111111;
-    --accent-green: #22ff6d;
-    --accent-red: #ff4444;
-    --accent-red-subtle: rgba(255,68,68,0.2);
-    --border-color: rgba(255,255,255,0.1);
-
-    --middle-width: clamp(85px, 13vw, 140px);
-    --nav-h: 32px;
-    --name-h: 44px;
-    --mid-gap: 1vh;
-    --label-fs: 0.65rem;
-    --logo-mh: 30px;
-    --spring-min: 10px;
-
-    --bottom-banner-h: 28px;
-}
-
-@media screen and (min-aspect-ratio: 21/10) {
-    :root {
-        --middle-width: 160px;
-        --name-h: 60px;
-        --mid-gap: 2vh;
-        --label-fs: 0.85rem;
-        --logo-mh: 55px;
-        --spring-min: 30px;
-    }
-}
-
-* {
-    box-sizing: border-box;
-    user-select: none !important;
-    -webkit-user-select: none !important;
-    -webkit-tap-highlight-color: transparent;
-    touch-action: none;
-}
-
-html, body {
-    margin: 0;
-    padding: 0;
-    width: 100vw;
-    height: 100dvh;
-    background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
-    color: #fff;
-    font-family: 'Chakra Petch', sans-serif;
-    overflow: hidden;
-    position: fixed;
-}
-
-/* MAIN LAYOUT */
-.main-wrapper {
-    display: flex;
-    flex-direction: column;
-    height: 100dvh;
-    width: 100%;
-    padding:
-        0
-        env(safe-area-inset-right)
-        calc(env(safe-area-inset-bottom) + var(--bottom-banner-h))
-        env(safe-area-inset-left);
-}
-
-/* TOP NAV */
-.top-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: var(--nav-h);
-    padding: 0 10px;
-    border-bottom: 1px solid var(--border-color);
-    margin-top: env(safe-area-inset-top);
-    flex-shrink: 0;
-}
-
-.logo-text {
-    font-size: 0.65rem;
-    font-weight: 700;
-    color: rgba(255,255,255,0.4);
-    text-transform: uppercase;
-}
-
-.nav-btn {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.15);
-    color: #aaa;
-    padding: 1px 8px;
-    border-radius: 4px;
-    font-size: 0.6rem;
-    cursor: pointer;
-}
-
-.nav-btn.reset {
-    background: var(--accent-red-subtle);
-    border-color: rgba(255,68,68,0.3);
-    color: #fff;
-}
-
-.nav-btn.undo {
-    border-color: var(--accent-green);
-    color: var(--accent-green);
-    font-weight: 700;
-}
-
-/* NAMES */
-.names-banner {
-    display: flex;
-    height: var(--name-h);
-    background: var(--banner-bg);
-    border-bottom: 1px solid var(--border-color);
-    flex-shrink: 0;
-}
-
-.name-slot {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: clamp(1.2rem, 3.8vw, 3.2rem);
-    font-weight: 900;
-    text-transform: uppercase;
-    color: #bbb;
-    overflow: hidden;
-    white-space: nowrap;
-    outline: none;
-    touch-action: pan-y;
-}
-
-.name-slot:focus {
-    color: var(--accent-green);
-    background: rgba(255,255,255,0.05);
-}
-
-.name-spacer {
-    width: var(--middle-width);
-    background: rgba(0,0,0,0.6);
-}
-
-/* SCORES */
-.scores-area {
-    display: flex;
-    flex: 1;
-    width: 100%;
-    overflow: hidden;
-}
-
-.score-pane {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.score-num {
-    font-size: clamp(7rem, 28vw, 33rem);
-    font-weight: 700;
-    line-height: 0.85;
-    cursor: pointer;
-    text-shadow: 0 0 30px rgba(0,0,0,0.6);
-}
-
-/* MIDDLE */
-.middle-banner {
-    width: var(--middle-width);
-    display: grid;
-    grid-template-rows: auto auto minmax(var(--spring-min),1fr) auto;
-    background: rgba(0,0,0,0.6);
-    border-left: 1px solid var(--border-color);
-    border-right: 1px solid var(--border-color);
-    padding: 10px 0;
-    flex-shrink: 0;
-}
-
-.middle-section {
-    text-align: center;
-    padding: 0 5px;
-}
-
-.middle-label {
-    font-size: var(--label-fs);
-    font-weight: 900;
-    text-transform: uppercase;
-}
-
-.break-arrow-svg {
-    width: 36px;
-    height: 36px;
-    fill: var(--accent-green);
-    filter: drop-shadow(0 0 8px rgba(34,255,109,0.6));
-    transition: transform .3s ease;
-}
-
-.flipped { transform: scaleX(-1); }
-
-.details-group {
-    display: flex;
-    flex-direction: column;
-    gap: var(--mid-gap);
-    margin-top: 10px;
-}
-
-.mid-select {
-    width: 92%;
-    font-family: inherit;
-    font-size: .75rem;
-    font-weight: 700;
-    background: #1a1a1a;
-    border: 1px solid #333;
-    color: #fff;
-    border-radius: 4px;
-    text-align: center;
-}
-
-.middle-logo {
-    width: 85%;
-    max-height: var(--logo-mh);
-    opacity: .7;
-    margin: 0 auto;
-}
-
-/* FLASH */
-@keyframes flashGreen { from{color:var(--accent-green)} to{color:#fff} }
-@keyframes flashRed { from{color:var(--accent-red)} to{color:#fff} }
-.f-green{animation:flashGreen .4s ease-out}
-.f-red{animation:flashRed .4s ease-out}
-
-/* ORIENTATION LOCK */
-#orientation-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: #000;
-    z-index: 10000;
-    align-items: center;
-    justify-content: center;
-}
-
-@media (orientation:portrait){
-    #orientation-overlay{display:flex}
-    .main-wrapper{display:none}
-}
-
-/* BOTTOM SAFE BANNER */
-.bottom-safe-banner {
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: var(--bottom-banner-h);
-    padding-bottom: env(safe-area-inset-bottom);
-    background: rgba(0,0,0,0.65);
-    border-top: 1px solid var(--border-color);
-    z-index: 9999;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    font-size: .65rem;
-    font-weight: 700;
-    letter-spacing: .08em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.55);
-    pointer-events: none;
-}
-</style>
-</head>
-
-<body>
-
-<div id="orientation-overlay"><h2>ROTATE TO LANDSCAPE</h2></div>
-
-<div class="main-wrapper">
-
-<header class="top-nav">
-    <div class="logo-text">WWW.CHALKYTROUSERS.CO.UK</div>
-    <div style="display:flex;gap:10px">
-        <button id="undo-btn" class="nav-btn undo" style="display:none" onclick="undoReset()">Undo</button>
-        <button id="fs-btn" class="nav-btn" onclick="toggleFS()">⛶ Fullscreen</button>
-        <button class="nav-btn reset" onclick="resetMatch()">Reset</button>
-    </div>
-</header>
-
-<nav class="names-banner">
-    <div id="p1-txt" class="name-slot" contenteditable spellcheck="false" oninput="limitName(this)">PLAYER 1</div>
-    <div class="name-spacer"></div>
-    <div id="p2-txt" class="name-slot" contenteditable spellcheck="false" oninput="limitName(this)">PLAYER 2</div>
-</nav>
-
-<main class="scores-area">
-    <section class="score-pane">
-        <div id="s1" class="score-num"
-             onpointerdown="scStart(event,'s1')"
-             onpointerup="scEnd(event,'s1')"
-             onpointerleave="scCancel('s1')">0</div>
-    </section>
-
-    <section class="middle-banner">
-        <div class="middle-section">
-            <div class="middle-label">BREAK</div>
-            <svg id="svg-arrow" class="break-arrow-svg" viewBox="0 0 24 24" onclick="toggleBreak()">
-                <path d="M15.41 16.59 10.83 12l4.58-4.59L14 6l-6 6 6 6z"/>
-            </svg>
-        </div>
-
-        <div class="details-group">
-            <div class="middle-section">
-                <div class="middle-label">RACE TO</div>
-                <select id="race-to-select" class="mid-select" onchange="save()">
-                    <option value="-">-</option>
-                </select>
-            </div>
-            <div class="middle-section">
-                <div class="middle-label">RULES</div>
-                <select id="ruleset-select" class="mid-select" onchange="save()">
-                    <option value="uk8">uk8</option>
-                    <option value="wpa">wpa</option>
-                    <option value="ultimate">ultimate</option>
-                    <option value="custom">custom</option>
-                </select>
-            </div>
-        </div>
-
-        <div></div>
-
-        <img class="middle-logo"
-             src="https://chalkytrousers.github.io/Chalky-Trousers-App-Android/assets/ct-logo-text.png?v=205"
-             alt="Chalky Trousers">
-    </section>
-
-    <section class="score-pane">
-        <div id="s2" class="score-num"
-             onpointerdown="scStart(event,'s2')"
-             onpointerup="scEnd(event,'s2')"
-             onpointerleave="scCancel('s2')">0</div>
-    </section>
-</main>
-</div>
-
-<div class="bottom-safe-banner">CHALKY TROUSERS</div>
-
-<script>
-const KEY='ct_v8_data';
-let breakSide=1,lastScores=null,lastBreakSide=null,holdT,isHold=false;
-
-function save(){
-    localStorage.setItem(KEY,JSON.stringify({
-        s1:s1.innerText,s2:s2.innerText,
-        p1:p1-txt?.innerText,p2:p2-txt?.innerText,
-        side:breakSide,
-        rules:ruleset-select.value,
-        race:race-to-select.value
-    }));
-}
-
-function load(){
-    const d=JSON.parse(localStorage.getItem(KEY)||'{}');
-    s1.innerText=d.s1||0;
-    s2.innerText=d.s2||0;
-    p1-txt.innerText=d.p1||'PLAYER 1';
-    p2-txt.innerText=d.p2||'PLAYER 2';
-    breakSide=d.side||1;
-    ruleset-select.value=d.rules||'uk8';
-    race-to-select.value=d.race||'-';
-    updateArrow();
-}
-
-function limitName(el){
-    if(el.innerText.length>15) el.innerText=el.innerText.slice(0,15);
-    save();
-}
-
-function toggleBreak(){breakSide=breakSide===1?2:1;updateArrow();save();}
-function updateArrow(){svg-arrow.classList.toggle('flipped',breakSide===2);}
-
-function scStart(e,id){
-    if(e.cancelable)e.preventDefault();
-    isHold=false;
-    holdT=setTimeout(()=>{isHold=true;upd(id,-1);flash(id,'red')},600);
-}
-function scEnd(e,id){
-    clearTimeout(holdT);
-    if(!isHold){upd(id,1,true);flash(id,'green')}
-}
-function scCancel(){clearTimeout(holdT)}
-
-function upd(id,n,isWin){
-    const el=document.getElementById(id);
-    el.innerText=Math.max(0,parseInt(el.innerText)+n);
-    if(isWin&&n>0)toggleBreak();else save();
-}
-
-function flash(id,c){
-    const el=document.getElementById(id);
-    el.classList.remove('f-green','f-red');
-    void el.offsetWidth;
-    el.classList.add(c==='green'?'f-green':'f-red');
-}
-
-function resetMatch(){
-    lastScores={s1:s1.innerText,s2:s2.innerText};
-    lastBreakSide=breakSide;
-    s1.innerText=s2.innerText=0;
-    undo-btn.style.display='block';
-    setTimeout(()=>undo-btn.style.display='none',5000);
-    save();
-}
-
-function undoReset(){
-    if(!lastScores)return;
-    s1.innerText=lastScores.s1;
-    s2.innerText=lastScores.s2;
-    breakSide=lastBreakSide;
-    updateArrow();
-    undo-btn.style.display='none';
-    save();
-}
-
-async function toggleFS(){
-    try{
-        if(!document.fullscreenElement){
-            await document.documentElement.requestFullscreen({navigationUI:'hide'});
-        }else{
-            await document.exitFullscreen();
+    <style>
+        :root {
+            --bg-dark: #000000;
+            --banner-bg: #111111;
+            --accent-green: #22ff6d;
+            --accent-red: #ff4444;
+            --accent-red-subtle: rgba(255, 68, 68, 0.2);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --middle-width: clamp(85px, 13vw, 140px);
+            --nav-h: 32px;
+            --name-h: 44px;
+            --bot-h: 20px; /* Slim bottom banner height */
+            --mid-gap: 1vh;
+            --label-fs: 0.65rem;
+            --logo-mh: 30px;
+            --spring-min: 10px;
         }
-    }catch(e){}
-}
 
-window.onload=()=>{
-    for(let i=1;i<=21;i++){
-        race-to-select.append(new Option(i,i));
-    }
-    load();
-};
-</script>
+        @media screen and (min-aspect-ratio: 21/10) {
+            :root {
+                --middle-width: 160px; 
+                --name-h: 60px;       
+                --mid-gap: 2vh;     
+                --label-fs: 0.85rem;  
+                --logo-mh: 55px;
+                --spring-min: 30px;
+                --bot-h: 25px;
+            }
+        }
 
+        * { 
+            box-sizing: border-box; 
+            user-select: none !important; 
+            -webkit-user-select: none !important; 
+            -webkit-tap-highlight-color: transparent; 
+            touch-action: none; 
+        }
+
+        body, html {
+            margin: 0; padding: 0; 
+            height: 100dvh; width: 100vw;
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
+            color: white; font-family: 'Chakra Petch', sans-serif;
+            overflow: hidden; position: fixed;
+        }
+
+        .main-wrapper {
+            display: flex; flex-direction: column; 
+            height: 100dvh; width: 100%;
+            /* Uses environment variables to protect against system bars */
+            padding: 0 env(safe-area-inset-right) 0 env(safe-area-inset-left);
+            justify-content: space-between;
+        }
+
+        /* Top Banner */
+        .top-nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 10px; height: var(--nav-h);
+            border-bottom: 1px solid var(--border-color); flex-shrink: 0;
+            background: var(--banner-bg);
+            margin-top: env(safe-area-inset-top);
+        }
+
+        .logo-text { font-size: 0.65rem; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; }
+        .nav-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); color: #888; padding: 1px 8px; border-radius: 4px; font-size: 0.6rem; cursor: pointer; }
+        .nav-btn.reset { background: var(--accent-red-subtle); border: 1px solid rgba(255, 68, 68, 0.3); color: white; }
+        .nav-btn.undo { border-color: var(--accent-green); color: var(--accent-green); font-weight: 700; }
+
+        .names-banner { display: flex; height: var(--name-h); background: var(--banner-bg); border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
+        .name-slot { 
+            flex: 1; display: flex; justify-content: center; align-items: center; 
+            font-size: clamp(1.2rem, 3.8vw, 3.2rem); font-weight: 900; 
+            text-transform: uppercase; color: #bbb; overflow: hidden; white-space: nowrap; outline: none;
+        }
+        .name-slot:focus { color: var(--accent-green); background: rgba(255,255,255,0.05); }
+        .name-spacer { width: var(--middle-width); background: rgba(0,0,0,0.8); }
+
+        /* Scoring Area */
+        .scores-area { display: flex; flex: 1; width: 100%; overflow: hidden; }
+        .score-pane { flex: 1; display: flex; justify-content: center; align-items: center; }
+
+        .middle-banner {
+            width: var(--middle-width); 
+            display: grid;
+            grid-template-rows: auto auto minmax(var(--spring-min), 1fr) auto;
+            background: rgba(0,0,0,0.8); 
+            border-left: 1px solid var(--border-color); 
+            border-right: 1px solid var(--border-color);
+            flex-shrink: 0;
+            padding: 10px 0 5px 0;
+        }
+
+        .middle-section { text-align: center; width: 100%; padding: 0 5px; }
+        .middle-label { font-size: var(--label-fs); font-weight: 900; color: #ffffff; text-transform: uppercase; margin-bottom: 1px; }
+        
+        .break-arrow-svg { width: 36px; height: 36px; fill: var(--accent-green); filter: drop-shadow(0 0 8px rgba(34, 255, 109, 0.6)); transition: transform 0.3s ease; }
+        .flipped { transform: scaleX(-1); }
+
+        .details-group { display: flex; flex-direction: column; gap: var(--mid-gap); margin-top: 10px; }
+        .mid-select {
+            background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 2px 0; border-radius: 4px;
+            font-family: inherit; font-size: 0.75rem; font-weight: 700; width: 92%; 
+            appearance: none; -webkit-appearance: none; text-align: center; text-align-last: center;
+        }
+
+        .spacer-spring { width: 100%; }
+        .middle-logo { width: 85%; max-height: var(--logo-mh); height: auto; opacity: 0.8; object-fit: contain; margin: 0 auto; display: block; padding-bottom: 5px; }
+        
+        .score-num { font-size: clamp(7rem, 28vw, 33rem); font-weight: 700; line-height: 0.85; text-shadow: 0 0 30px rgba(0,0,0,0.6); cursor: pointer; color: white; }
+
+        /* New Bottom Banner */
+        .bottom-banner {
+            height: var(--bot-h);
+            background: var(--banner-bg);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        .bottom-text { font-size: 0.55rem; font-weight: 700; color: rgba(255,255,255,0.2); text-transform: uppercase; letter-spacing: 1px; }
+
+        @keyframes flashGreen { 0% { color: var(--accent-green); } 100% { color: white; } }
+        @keyframes flashRed { 0% { color: var(--accent-red); } 100% { color: white; } }
+        .f-green { animation: flashGreen 0.4s ease-out forwards; }
+        .f-red { animation: flashRed 0.4s ease-out forwards; }
+
+        #orientation-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 10000; flex-direction: column; justify-content: center; align-items: center; }
+        @media screen and (orientation: portrait) { #orientation-overlay { display: flex; } .main-wrapper { display: none; } }
+    </style>
+</head>
+<body>
+    <div id="orientation-overlay"><h2>ROTATE TO LANDSCAPE</h2></div>
+    
+    <div class="main-wrapper">
+        <header class="top-nav">
+            <div class="logo-text">CHALKY TROUSERS</div>
+            <div style="display:flex; gap:10px;">
+                <button class="nav-btn undo" id="undo-btn" style="display:none;" onclick="undoReset()">Undo</button>
+                <button class="nav-btn" id="fs-btn" onclick="toggleFS()">⛶ Fullscreen</button>
+                <button class="nav-btn reset" onclick="resetMatch()">Reset</button>
+            </div>
+        </header>
+
+        <nav class="names-banner">
+            <div class="name-slot" id="p1-txt" contenteditable="true" spellcheck="false" oninput="limitName(this)">PLAYER 1</div>
+            <div class="name-spacer"></div>
+            <div class="name-slot" id="p2-txt" contenteditable="true" spellcheck="false" oninput="limitName(this)">PLAYER 2</div>
+        </nav>
+
+        <main class="scores-area">
+            <section class="score-pane">
+                <div class="score-num" id="s1" onpointerdown="scStart(event, 's1')" onpointerup="scEnd(event, 's1')" onpointerleave="scCancel('s1')">0</div>
+            </section>
+            
+            <section class="middle-banner">
+                <div class="middle-section">
+                    <div class="middle-label">BREAK</div>
+                    <div id="arrow-wrap" onclick="toggleBreak()">
+                        <svg id="svg-arrow" class="break-arrow-svg" viewBox="0 0 24 24"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/></svg>
+                    </div>
+                </div>
+
+                <div class="details-group">
+                    <div class="middle-section">
+                        <div class="middle-label">RACE TO</div>
+                        <select id="race-to-select" class="mid-select" onchange="save()">
+                            <option value="-">-</option>
+                        </select>
+                    </div>
+                    <div class="middle-section">
+                        <div class="middle-label">RULES</div>
+                        <select id="ruleset-select" class="mid-select" onchange="save()">
+                            <option value="uk8">uk8</option>
+                            <option value="wpa">wpa</option>
+                            <option value="ultimate">ultimate</option>
+                            <option value="custom">custom</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="spacer-spring"></div>
+                <img id="logo-img" src="https://chalkytrousers.github.io/Chalky-Trousers-App-Android/assets/ct-logo-text.png?v=205" class="middle-logo" alt="Logo">
+            </section>
+
+            <section class="score-pane">
+                <div class="score-num" id="s2" onpointerdown="scStart(event, 's2')" onpointerup="scEnd(event, 's2')" onpointerleave="scCancel('s2')">0</div>
+            </section>
+        </main>
+
+        <footer class="bottom-banner">
+            <div class="bottom-text">WWW.CHALKYTROUSERS.CO.UK</div>
+        </footer>
+    </div>
+
+    <script>
+        const KEY = 'ct_v8_data';
+        let breakSide = 1;
+        let lastScores = null;
+        let lastBreakSide = null;
+        let undoTimeout = null;
+
+        function save() {
+            const d = {
+                s1: document.getElementById('s1').innerText,
+                s2: document.getElementById('s2').innerText,
+                p1: document.getElementById('p1-txt').innerText.trim(),
+                p2: document.getElementById('p2-txt').innerText.trim(),
+                side: breakSide,
+                rules: document.getElementById('ruleset-select').value,
+                race: document.getElementById('race-to-select').value
+            };
+            localStorage.setItem(KEY, JSON.stringify(d));
+        }
+
+        function load() {
+            const s = localStorage.getItem(KEY);
+            if (s) {
+                const d = JSON.parse(s);
+                document.getElementById('s1').innerText = d.s1 || "0";
+                document.getElementById('s2').innerText = d.s2 || "0";
+                document.getElementById('p1-txt').innerText = d.p1 || "PLAYER 1";
+                document.getElementById('p2-txt').innerText = d.p2 || "PLAYER 2";
+                breakSide = d.side || 1;
+                updateArrow();
+                document.getElementById('ruleset-select').value = d.rules || "uk8";
+                document.getElementById('race-to-select').value = d.race || "-";
+            }
+        }
+
+        function limitName(el) {
+            if (el.innerText.length > 15) {
+                const selection = window.getSelection();
+                const range = selection.getRangeAt(0);
+                const offset = range.startOffset;
+                el.innerText = el.innerText.substring(0, 15);
+                const newRange = document.createRange();
+                newRange.setStart(el.childNodes[0] || el, Math.min(offset, 15));
+                newRange.collapse(true);
+                selection.removeAllRanges();
+                selection.addRange(newRange);
+            }
+            save();
+        }
+
+        document.querySelectorAll('.name-slot').forEach(slot => {
+            slot.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); slot.blur(); } });
+        });
+
+        function toggleBreak() { breakSide = breakSide === 1 ? 2 : 1; updateArrow(); save(); }
+        function updateArrow() { const a = document.getElementById('svg-arrow'); if (breakSide === 1) a.classList.remove('flipped'); else a.classList.add('flipped'); }
+        
+        let holdT, isHold = false;
+        function scStart(e, id) { 
+            if (e.cancelable) e.preventDefault(); 
+            isHold = false; 
+            holdT = setTimeout(() => { isHold = true; upd(id, -1); flash(id, 'red'); }, 600); 
+        }
+        function scEnd(e, id) { clearTimeout(holdT); if (!isHold) { upd(id, 1, true); flash(id, 'green'); } }
+        function scCancel(id) { clearTimeout(holdT); }
+
+        function upd(id, n, isWin = false) { 
+            const el = document.getElementById(id); 
+            let v = parseInt(el.innerText) + n; 
+            el.innerText = v < 0 ? 0 : v; 
+            if (isWin && n > 0) toggleBreak();
+            else save(); 
+        }
+
+        function flash(id, type) {
+            const el = document.getElementById(id);
+            const cls = type === 'green' ? 'f-green' : 'f-red';
+            el.classList.remove('f-green', 'f-red');
+            void el.offsetWidth;
+            el.classList.add(cls);
+        }
+
+        function resetMatch() {
+            lastScores = { s1: document.getElementById('s1').innerText, s2: document.getElementById('s2').innerText };
+            lastBreakSide = breakSide;
+            document.getElementById('s1').innerText = "0";
+            document.getElementById('s2').innerText = "0";
+            save();
+            const ub = document.getElementById('undo-btn');
+            ub.style.display = 'block';
+            clearTimeout(undoTimeout);
+            undoTimeout = setTimeout(() => { ub.style.display = 'none'; }, 5000);
+        }
+
+        function undoReset() {
+            if (lastScores) {
+                document.getElementById('s1').innerText = lastScores.s1;
+                document.getElementById('s2').innerText = lastScores.s2;
+                breakSide = lastBreakSide;
+                updateArrow();
+                lastScores = null;
+                document.getElementById('undo-btn').style.display = 'none';
+                save();
+            }
+        }
+
+        function toggleFS() {
+            if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+            else document.exitFullscreen();
+        }
+
+        window.addEventListener('load', () => {
+            const raceSel = document.getElementById('race-to-select');
+            for(let i=1; i<=21; i++) {
+                let opt = document.createElement('option');
+                opt.value = i; opt.innerText = i;
+                raceSel.appendChild(opt);
+            }
+            load();
+        });
+
+        window.oncontextmenu = (e) => { if(e.target.classList.contains('score-num')) { e.preventDefault(); return false; } };
+    </script>
 </body>
 </html>
