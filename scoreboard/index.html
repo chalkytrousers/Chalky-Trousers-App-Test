@@ -21,7 +21,7 @@
             --bot-h: 20px;
             --mid-gap: 1vh;
             --label-fs: 0.65rem;
-            --logo-mh: 45px; /* Increased to allow it to stay big while lifted */
+            --logo-mh: 45px;
             --spring-min: 10px;
         }
 
@@ -31,7 +31,7 @@
                 --name-h: 60px;       
                 --mid-gap: 2vh;     
                 --label-fs: 0.85rem;  
-                --logo-mh: 65px; /* Even bigger headroom for Samsung */
+                --logo-mh: 65px;
                 --spring-min: 20px;
                 --bot-h: 25px;
             }
@@ -94,7 +94,7 @@
             border-left: 1px solid var(--border-color); 
             border-right: 1px solid var(--border-color);
             flex-shrink: 0;
-            padding: 10px 0 0 0; /* Remove fixed bottom padding here */
+            padding: 10px 0 0 0;
         }
 
         .middle-section { text-align: center; width: 100%; padding: 0 5px; }
@@ -111,15 +111,13 @@
         }
 
         .spacer-spring { width: 100%; }
-
-        /* Lift the logo using margin while allowing it to fill width */
         .middle-logo { 
             width: 90%; 
             max-height: var(--logo-mh); 
             height: auto; 
             opacity: 0.8; 
             object-fit: contain; 
-            margin: 0 auto 30px auto; /* This 30px is what lifts it up */
+            margin: 0 auto 30px auto; 
             display: block;
         }
         
@@ -151,7 +149,7 @@
     
     <div class="main-wrapper">
         <header class="top-nav">
-            <div class="logo-text">CHALKY TROUSERS SCOREBOARD</div>
+            <div class="logo-text">CHALKY TROUSERS</div>
             <div style="display:flex; gap:10px;">
                 <button class="nav-btn undo" id="undo-btn" style="display:none;" onclick="undoReset()">Undo</button>
                 <button class="nav-btn" id="fs-btn" onclick="toggleFS()">⛶ Fullscreen</button>
@@ -264,7 +262,12 @@
             slot.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); slot.blur(); } });
         });
 
-        function toggleBreak() { breakSide = breakSide === 1 ? 2 : 1; updateArrow(); save(); }
+        function toggleBreak() { 
+            if (window.navigator.vibrate) window.navigator.vibrate(15);
+            breakSide = breakSide === 1 ? 2 : 1; 
+            updateArrow(); 
+            save(); 
+        }
         function updateArrow() { const a = document.getElementById('svg-arrow'); if (breakSide === 1) a.classList.remove('flipped'); else a.classList.add('flipped'); }
         
         let holdT, isHold = false;
@@ -280,6 +283,13 @@
             const el = document.getElementById(id); 
             let v = parseInt(el.innerText) + n; 
             el.innerText = v < 0 ? 0 : v; 
+
+            // Haptic feedback
+            if (window.navigator.vibrate) {
+                if (n > 0) window.navigator.vibrate(20);
+                else window.navigator.vibrate(40);
+            }
+
             if (isWin && n > 0) toggleBreak();
             else save(); 
         }
@@ -293,6 +303,7 @@
         }
 
         function resetMatch() {
+            if (window.navigator.vibrate) window.navigator.vibrate(60);
             lastScores = { s1: document.getElementById('s1').innerText, s2: document.getElementById('s2').innerText };
             lastBreakSide = breakSide;
             document.getElementById('s1').innerText = "0";
@@ -305,6 +316,7 @@
         }
 
         function undoReset() {
+            if (window.navigator.vibrate) window.navigator.vibrate(30);
             if (lastScores) {
                 document.getElementById('s1').innerText = lastScores.s1;
                 document.getElementById('s2').innerText = lastScores.s2;
