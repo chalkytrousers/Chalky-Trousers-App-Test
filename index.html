@@ -9,7 +9,7 @@
     <link rel="apple-touch-icon" href="assets/logo-192.png">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
-    <title>Chalky Trousers - v11.7</title>
+    <title>Chalky Trousers - v11.8</title>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;700;900&display=swap" rel="stylesheet">
 
     <style>
@@ -18,7 +18,7 @@
             --banner-bg: #111111;
             --accent-green: #22ff6d;
             --border-color: rgba(255, 255, 255, 0.1);
-            --nav-h: 50px;
+            --nav-h: 64px; /* Beefier header height */
             --info-bar-h: 40px;
         }
 
@@ -27,7 +27,7 @@
             user-select: none !important; 
             -webkit-user-select: none !important; 
             touch-action: none; 
-            transform: translateZ(0);
+            transform: translateZ(0); /* Ensures smooth resizing on iOS and Android */
         }
 
         [contenteditable] { user-select: text !important; -webkit-user-select: text !important; touch-action: auto !important; }
@@ -46,27 +46,31 @@
             padding: 0 env(safe-area-inset-right) 0 env(safe-area-inset-left);
         }
 
-        /* TOP NAV: Integrating Logo into the header */
+        /* BEEFIER TOP NAV: Logo is now much larger and fully opaque */
         .top-nav {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 0 15px; background: var(--banner-bg); border-bottom: 1px solid var(--border-color);
+            padding: 0 15px; background: var(--banner-bg); border-bottom: 2px solid var(--border-color);
             padding-top: env(safe-area-inset-top); height: calc(var(--nav-h) + env(safe-area-inset-top));
             flex-shrink: 0;
         }
 
-        .header-logo { height: 24px; width: auto; opacity: 0.9; }
+        .header-logo { 
+            height: 38px; /* Increased from 24px */
+            width: auto; 
+            opacity: 1; /* Removed transparency for maximum visibility */
+            filter: drop-shadow(0 0 5px rgba(255,255,255,0.1));
+        }
         
         .btn-group { display: flex; gap: 8px; align-items: center; }
         
         .nav-btn { 
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); 
-            color: #ccc; padding: 6px 12px; border-radius: 6px; font-size: 0.7rem; 
+            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); 
+            color: #fff; padding: 8px 14px; border-radius: 6px; font-size: 0.75rem; 
             cursor: pointer; font-weight: 700;
         }
-        .nav-btn.fs-btn { border-color: rgba(255,255,255,0.4); color: #fff; }
-        .nav-btn.reset { background: rgba(255, 68, 68, 0.1); border-color: rgba(255, 68, 68, 0.3); color: #ff4444; }
+        .nav-btn.fs-btn { border-color: rgba(255,255,255,0.4); background: rgba(255,255,255,0.1); }
+        .nav-btn.reset { background: rgba(255, 68, 68, 0.15); border-color: rgba(255, 68, 68, 0.4); color: #ff6666; }
 
-        /* NAMES BAR */
         .names-row { display: flex; height: clamp(45px, 10vh, 80px); background: #080808; border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
         .name-slot { 
             flex: 1; display: flex; justify-content: center; align-items: center; 
@@ -75,7 +79,6 @@
         }
         .name-slot.breaking { color: var(--accent-green); text-shadow: 0 0 15px rgba(34, 255, 109, 0.4); }
 
-        /* MAIN SCORE AREA: Purely functional */
         .scores-main { display: flex; flex: 1; width: 100%; position: relative; }
         .score-pane { 
             flex: 1; display: flex; justify-content: center; align-items: center; 
@@ -89,7 +92,6 @@
 
         .divider { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); height: 60%; width: 1px; background: var(--border-color); pointer-events: none; }
 
-        /* INFO BAR */
         .info-bar { 
             display: flex; justify-content: center; align-items: center; gap: 30px;
             background: var(--banner-bg); border-top: 1px solid var(--border-color);
