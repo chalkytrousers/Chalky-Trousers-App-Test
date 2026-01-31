@@ -9,7 +9,7 @@
     <link rel="apple-touch-icon" href="assets/logo-192.png">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
-    <title>Chalky Trousers - v11.6</title>
+    <title>Chalky Trousers - v11.7</title>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;700;900&display=swap" rel="stylesheet">
 
     <style>
@@ -18,7 +18,7 @@
             --banner-bg: #111111;
             --accent-green: #22ff6d;
             --border-color: rgba(255, 255, 255, 0.1);
-            --nav-h: 44px;
+            --nav-h: 50px;
             --info-bar-h: 40px;
         }
 
@@ -46,7 +46,7 @@
             padding: 0 env(safe-area-inset-right) 0 env(safe-area-inset-left);
         }
 
-        /* TOP NAV: Consolidated control group */
+        /* TOP NAV: Integrating Logo into the header */
         .top-nav {
             display: flex; justify-content: space-between; align-items: center;
             padding: 0 15px; background: var(--banner-bg); border-bottom: 1px solid var(--border-color);
@@ -54,16 +54,16 @@
             flex-shrink: 0;
         }
 
-        .logo-text { font-size: 0.8rem; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; }
+        .header-logo { height: 24px; width: auto; opacity: 0.9; }
         
         .btn-group { display: flex; gap: 8px; align-items: center; }
         
         .nav-btn { 
             background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); 
-            color: #ccc; padding: 6px 12px; border-radius: 6px; font-size: 0.65rem; 
+            color: #ccc; padding: 6px 12px; border-radius: 6px; font-size: 0.7rem; 
             cursor: pointer; font-weight: 700;
         }
-        .nav-btn.fs-btn { border-color: rgba(255,255,255,0.3); color: #fff; }
+        .nav-btn.fs-btn { border-color: rgba(255,255,255,0.4); color: #fff; }
         .nav-btn.reset { background: rgba(255, 68, 68, 0.1); border-color: rgba(255, 68, 68, 0.3); color: #ff4444; }
 
         /* NAMES BAR */
@@ -75,35 +75,21 @@
         }
         .name-slot.breaking { color: var(--accent-green); text-shadow: 0 0 15px rgba(34, 255, 109, 0.4); }
 
-        /* MAIN SCORE AREA: Centered score alignment */
+        /* MAIN SCORE AREA: Purely functional */
         .scores-main { display: flex; flex: 1; width: 100%; position: relative; }
         .score-pane { 
-            flex: 1; display: flex; flex-direction: column; 
-            justify-content: center; align-items: center; 
+            flex: 1; display: flex; justify-content: center; align-items: center; 
             height: 100%; position: relative;
         }
         
         .score-num { 
-            font-size: clamp(8rem, 58vh, 55rem); font-weight: 700; line-height: 1; 
+            font-size: clamp(8rem, 58vh, 60rem); font-weight: 700; line-height: 1; 
             cursor: pointer; color: white; will-change: contents; 
         }
 
-        /* CENTER DIVIDER & LOGO */
-        .center-stack {
-            position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-            display: flex; flex-direction: column; align-items: center;
-            height: 70%; width: 220px; pointer-events: none; z-index: 10;
-        }
-        .divider { flex: 1; width: 1px; background: var(--border-color); }
-        .logo-box {
-            margin-top: -10px; width: 100%; 
-            display: flex; justify-content: center;
-        }
-        .main-logo { 
-            width: 140px; height: auto; opacity: 0.8; 
-            filter: drop-shadow(0 0 10px rgba(0,0,0,0.9)); 
-        }
+        .divider { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); height: 60%; width: 1px; background: var(--border-color); pointer-events: none; }
 
+        /* INFO BAR */
         .info-bar { 
             display: flex; justify-content: center; align-items: center; gap: 30px;
             background: var(--banner-bg); border-top: 1px solid var(--border-color);
@@ -122,7 +108,7 @@
     <div id="orientation-overlay"><h2>ROTATE TO LANDSCAPE</h2></div>
     <div class="app-container">
         <header class="top-nav">
-            <div class="logo-text">CT SCOREBOARD</div>
+            <img src="https://chalkytrousers.github.io/Chalky-Trousers-App-Android/assets/ct-logo-text.png" class="header-logo" alt="Chalky Trousers">
             <div class="btn-group">
                 <button class="nav-btn undo" id="undo-btn" style="visibility:hidden;">Undo</button>
                 <button class="nav-btn fs-btn" id="fs-toggle">⛶ Fullscreen</button>
@@ -136,17 +122,10 @@
         </nav>
 
         <main class="scores-main">
-            <div class="center-stack">
-                <div class="divider"></div>
-                <div class="logo-box">
-                    <img src="https://chalkytrousers.github.io/Chalky-Trousers-App-Android/assets/ct-logo-text.png" class="main-logo" alt="Logo">
-                </div>
-            </div>
-
+            <div class="divider"></div>
             <section class="score-pane">
                 <div class="score-num" id="s1" onpointerdown="scStart(event, 's1')" onpointerup="scEnd(event, 's1')">0</div>
             </section>
-            
             <section class="score-pane">
                 <div class="score-num" id="s2" onpointerdown="scStart(event, 's2')" onpointerup="scEnd(event, 's2')">0</div>
             </section>
