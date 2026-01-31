@@ -9,7 +9,7 @@
     <link rel="apple-touch-icon" href="assets/logo-192.png">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
-    <title>Chalky Trousers - v11.4</title>
+    <title>Chalky Trousers - v11.5</title>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;700;900&display=swap" rel="stylesheet">
 
     <style>
@@ -17,10 +17,11 @@
             --bg-dark: #000000;
             --banner-bg: #111111;
             --accent-green: #22ff6d;
-            --accent-red-subtle: rgba(255, 68, 68, 0.2);
             --border-color: rgba(255, 255, 255, 0.1);
             --nav-h: 44px;
             --info-bar-h: 40px;
+            /* SAFETY BUFFER: Physically prevents scores from touching the center */
+            --center-gap: clamp(100px, 18vw, 200px); 
         }
 
         * { 
@@ -58,44 +59,43 @@
 
         .logo-text { font-size: 0.8rem; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; }
         
-        /* TIGHT CONTROL GROUP */
-        .btn-group { display: flex; gap: 6px; align-items: center; }
+        /* CONSOLIDATED BUTTON GROUP */
+        .btn-group { display: flex; gap: 8px; align-items: center; }
         
         .nav-btn { 
             background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); 
             color: #ccc; padding: 6px 10px; border-radius: 6px; font-size: 0.65rem; 
-            cursor: pointer; font-weight: 700; position: relative;
+            cursor: pointer; font-weight: 700;
         }
-        .nav-btn.fs-btn { border-color: rgba(255,255,255,0.3); color: #fff; padding: 6px 12px; }
-        .nav-btn.reset { background: rgba(255, 68, 68, 0.08); border-color: rgba(255, 68, 68, 0.2); color: rgba(255, 255, 255, 0.5); }
+        .nav-btn.fs-btn { border-color: rgba(255,255,255,0.3); color: #fff; padding: 6px 14px; }
+        .nav-btn.reset { background: rgba(255, 68, 68, 0.1); border-color: rgba(255, 68, 68, 0.3); color: #ff4444; }
         .nav-btn.undo { border-color: var(--accent-green); color: var(--accent-green); }
 
         .names-row { display: flex; height: clamp(45px, 10vh, 80px); background: #080808; border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
         .name-slot { flex: 1; display: flex; justify-content: center; align-items: center; font-size: clamp(1.2rem, 4.5vh, 4rem); font-weight: 900; text-transform: uppercase; color: #555; transition: all 0.3s ease; }
         .name-slot.breaking { color: var(--accent-green); text-shadow: 0 0 15px rgba(34, 255, 109, 0.4); }
 
-        .scores-main { display: flex; flex: 1; width: 100%; align-items: center; overflow: hidden; position: relative; }
-        .score-pane { flex: 1; display: flex; justify-content: center; align-items: center; height: 100%; position: relative; }
+        .scores-main { display: flex; flex: 1; width: 100%; align-items: center; overflow: hidden; }
+        .score-pane { flex: 1; display: flex; justify-content: center; align-items: center; height: 100%; }
         
-        /* Score depth and safety */
         .score-num { 
             font-size: clamp(8rem, 58vh, 55rem); font-weight: 700; line-height: 1; 
-            cursor: pointer; color: white; will-change: contents; z-index: 2; 
+            cursor: pointer; color: white; will-change: contents; 
         }
 
-        /* CENTRAL LOGO AREA - Carousel Ready */
+        /* FIXED CENTER STACK */
         .center-stack {
+            width: var(--center-gap); 
             display: flex; flex-direction: column; align-items: center;
-            height: 65%; width: 1px; flex-shrink: 0; position: relative;
+            height: 70%; flex-shrink: 0;
         }
         .divider { flex: 1; width: 1px; background: var(--border-color); }
         .logo-box {
-            position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%);
-            width: clamp(120px, 20vw, 240px); height: auto;
-            display: flex; justify-content: center; align-items: center;
-            padding: 10px 0; background: var(--bg-dark); /* Masks divider behind logo */
+            width: 80%; /* Logo is now smaller within the gap */
+            margin-bottom: -15px; /* Sits slightly lower */
+            z-index: 5;
         }
-        .main-logo { width: 100%; height: auto; opacity: 0.7; object-fit: contain; }
+        .main-logo { width: 100%; height: auto; opacity: 0.8; object-fit: contain; }
 
         .info-bar { 
             display: flex; justify-content: center; align-items: center; gap: 30px;
@@ -193,11 +193,9 @@
             const rs = document.getElementById('race-to-select'); 
             for(let i=1; i<=21; i++) { let o = document.createElement('option'); o.value = i; o.innerText = i; rs.appendChild(o); } 
             load(); 
-            // Unified Event Listeners
             const rb = document.getElementById('reset-btn');
             const ub = document.getElementById('undo-btn');
             const fs = document.getElementById('fs-toggle');
-            
             rb.addEventListener('touchstart', performReset); 
             ub.addEventListener('touchstart', undoReset);
             fs.addEventListener('touchstart', toggleFullscreen);
