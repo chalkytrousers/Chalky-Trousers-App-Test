@@ -9,7 +9,7 @@
     <link rel="apple-touch-icon" href="assets/logo-192.png">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#000000">
-    <title>Chalky Trousers - v11.1</title>
+    <title>Chalky Trousers - v11.2</title>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;700;900&display=swap" rel="stylesheet">
 
     <style>
@@ -49,7 +49,7 @@
             padding: 0 env(safe-area-inset-right) 0 env(safe-area-inset-left);
         }
 
-        /* FIXED TOP NAV */
+        /* TOP NAV */
         .top-nav {
             display: flex; justify-content: space-between; align-items: center;
             padding: 0 15px; background: var(--banner-bg); border-bottom: 1px solid var(--border-color);
@@ -58,52 +58,45 @@
         }
 
         .logo-text { font-size: 0.8rem; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; }
-        
-        .nav-btn { 
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); 
-            color: #ccc; padding: 6px 14px; border-radius: 6px; font-size: 0.7rem; 
-            cursor: pointer; font-weight: 700; position: relative;
-        }
+        .nav-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); color: #ccc; padding: 6px 14px; border-radius: 6px; font-size: 0.7rem; cursor: pointer; font-weight: 700; position: relative; }
         .nav-btn.fs-btn { border-color: rgba(255,255,255,0.3); color: #fff; }
         .nav-btn.reset { background: rgba(255, 68, 68, 0.08); border-color: rgba(255, 68, 68, 0.2); color: rgba(255, 255, 255, 0.5); }
         .nav-btn.undo { border-color: var(--accent-green); color: var(--accent-green); }
 
         /* NAMES BAR */
         .names-row { display: flex; height: clamp(45px, 10vh, 80px); background: #080808; border-bottom: 1px solid var(--border-color); flex-shrink: 0; }
-        .name-slot { 
-            flex: 1; display: flex; justify-content: center; align-items: center; 
-            font-size: clamp(1.2rem, 4.5vh, 4rem); font-weight: 900; 
-            text-transform: uppercase; color: #555; transition: all 0.3s ease;
-        }
+        .name-slot { flex: 1; display: flex; justify-content: center; align-items: center; font-size: clamp(1.2rem, 4.5vh, 4rem); font-weight: 900; text-transform: uppercase; color: #555; transition: all 0.3s ease; }
         .name-slot.breaking { color: var(--accent-green); text-shadow: 0 0 15px rgba(34, 255, 109, 0.4); }
 
-        /* MAIN SCORE AREA */
-        .scores-main { display: flex; flex: 1; width: 100%; align-items: center; overflow: hidden; }
-        .score-pane { flex: 1; display: flex; justify-content: center; align-items: center; height: 100%; }
-        .score-num { font-size: clamp(8rem, 58vh, 55rem); font-weight: 700; line-height: 1; cursor: pointer; color: white; will-change: contents; }
+        /* MAIN SCORE AREA WITH CORNER LOGOS */
+        .scores-main { display: flex; flex: 1; width: 100%; align-items: center; overflow: hidden; position: relative; }
+        .score-pane { flex: 1; display: flex; justify-content: center; align-items: center; height: 100%; position: relative; }
+        .score-num { font-size: clamp(8rem, 58vh, 55rem); font-weight: 700; line-height: 1; cursor: pointer; color: white; will-change: contents; z-index: 2; }
         .divider { width: 1px; height: 50%; background: var(--border-color); flex-shrink: 0; }
+
+        /* CORNER LOGO STYLING */
+        .corner-logo {
+            position: absolute;
+            bottom: 15px;
+            width: clamp(80px, 15vw, 180px); /* Larger, scaling logo */
+            height: auto;
+            opacity: 0.3; /* Subtle watermark look */
+            pointer-events: none;
+            z-index: 1;
+        }
+        .logo-left { left: 15px; }
+        .logo-right { right: 15px; }
 
         /* INFO BAR */
         .info-bar { 
             display: flex; justify-content: center; align-items: center; gap: 30px;
             height: var(--info-bar-h); background: var(--banner-bg); border-top: 1px solid var(--border-color);
-            flex-shrink: 0;
+            flex-shrink: 0; padding-bottom: env(safe-area-inset-bottom);
+            height: calc(var(--info-bar-h) + env(safe-area-inset-bottom));
         }
         .info-item { display: flex; align-items: center; gap: 10px; }
         .info-label { font-size: 0.65rem; font-weight: 900; color: #666; text-transform: uppercase; }
-        .info-select {
-            background: #1a1a1a; border: 1px solid #333; color: #fff; 
-            padding: 2px 8px; border-radius: 4px; font-family: inherit; font-size: 0.75rem; 
-            font-weight: 700; appearance: none; -webkit-appearance: none; text-align: center;
-        }
-
-        /* FIXED FOOTER */
-        .footer-logo-row { 
-            display: flex; justify-content: center; align-items: center;
-            height: calc(30px + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom);
-            background: #000; flex-shrink: 0; border-top: 1px solid var(--border-color);
-        }
-        .footer-logo { height: 16px; width: auto; opacity: 0.5; }
+        .info-select { background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 2px 8px; border-radius: 4px; font-family: inherit; font-size: 0.75rem; font-weight: 700; appearance: none; -webkit-appearance: none; text-align: center; }
 
         #orientation-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 10000; flex-direction: column; justify-content: center; align-items: center; }
         @media screen and (orientation: portrait) { #orientation-overlay { display: flex; } .app-container { display: none; } }
@@ -127,9 +120,15 @@
         </nav>
 
         <main class="scores-main">
-            <section class="score-pane"><div class="score-num" id="s1" onpointerdown="scStart(event, 's1')" onpointerup="scEnd(event, 's1')">0</div></section>
+            <section class="score-pane">
+                <img src="https://chalkytrousers.github.io/Chalky-Trousers-App-Android/assets/ct-logo-text.png" class="corner-logo logo-left" alt="Logo">
+                <div class="score-num" id="s1" onpointerdown="scStart(event, 's1')" onpointerup="scEnd(event, 's1')">0</div>
+            </section>
             <div class="divider"></div>
-            <section class="score-pane"><div class="score-num" id="s2" onpointerdown="scStart(event, 's2')" onpointerup="scEnd(event, 's2')">0</div></section>
+            <section class="score-pane">
+                <img src="https://chalkytrousers.github.io/Chalky-Trousers-App-Android/assets/ct-logo-text.png" class="corner-logo logo-right" alt="Logo">
+                <div class="score-num" id="s2" onpointerdown="scStart(event, 's2')" onpointerup="scEnd(event, 's2')">0</div>
+            </section>
         </main>
 
         <div class="info-bar">
@@ -144,10 +143,6 @@
                 </select>
             </div>
         </div>
-
-        <footer class="footer-logo-row">
-            <img src="https://chalkytrousers.github.io/Chalky-Trousers-App-Android/assets/ct-logo-text.png" class="footer-logo" alt="Logo">
-        </footer>
     </div>
 
     <script>
@@ -156,9 +151,7 @@
 
         function toggleFullscreen() {
             if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(err => {
-                    console.log(`Error: ${err.message}`);
-                });
+                document.documentElement.requestFullscreen().catch(err => { console.log(`Error: ${err.message}`); });
             } else {
                 document.exitFullscreen();
             }
